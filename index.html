@@ -293,6 +293,10 @@
   let currentSurface = 'asfalt';
   let sterkMimo = true;
 
+  // Globální proměnné pro číselné výsledky k uložení
+  let valNad = 0;
+  let valMimo = 0;
+
   function toggleTheme() { document.body.classList.toggle('dark-mode'); }
 
   function setTyp(t) {
@@ -313,14 +317,9 @@
   }
 
   function updateVisibility() {
-    // Hloubka se ukáže pokud: je to v Zeleni NEBO je to Ostatní + Štěrk + Aktivní přepínač
     const showH = (currentTyp === 'zelen') || (currentTyp === 'ostatni' && currentSurface === 'štěrk' && sterkMimo);
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
-    
-    // Povrchy se ukážou jen u "Ostatní"
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
-    
-    // Přepínač štěrku jen u povrchu "štěrk"
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' ? 'flex' : 'none');
   }
 
@@ -337,63 +336,56 @@
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
 
-    const nad = d * s;
-    let mimo = 0;
+    valNad = d * s;
     let formula = "";
     let subMimoText = "";
 
     if (currentTyp === 'ostatni') {
       if (currentSurface === 'štěrk' && sterkMimo) {
-        // Logika jako u zeleně
         const koef = (s + h + 0.6);
-        mimo = d * koef;
+        valMimo = d * koef;
         subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
         formula = `Vzorec (Štěrk s hloubkou): (D × Š) + (D × (Š + H + 0,6))`;
       } else if (currentSurface === 'štěrk' && !sterkMimo) {
-        mimo = 0;
+        valMimo = 0;
         subMimoText = "0,00";
         formula = `Vzorec: D × Š (bez přídavné plochy)`;
       } else {
-        // Standardní ostatní (asfalt, dlažba)
-        mimo = d * 0.5;
+        valMimo = d * 0.5;
         subMimoText = `${d.toFixed(2)} × 0,50`;
         formula = `Vzorec: (D × Š) + (D × 0,5)`;
       }
     } else {
-      // V zeleni
       const koef = (s + h + 0.6);
-      mimo = d * koef;
+      valMimo = d * koef;
       subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
       formula = `Vzorec: (D × Š) + (D × (Š + H + 0,6))`;
     }
 
     const f = (n) => n.toFixed(2).replace('.', ',');
 
-    document.getElementById('res-nad').textContent = f(nad) + ' m²';
+    document.getElementById('res-nad').textContent = f(valNad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
     
-    document.getElementById('box-mimo').style.opacity = mimo === 0 ? '0.3' : '1';
-    document.getElementById('res-mimo').textContent = f(mimo) + ' m²';
+    document.getElementById('box-mimo').style.opacity = valMimo === 0 ? '0.3' : '1';
+    document.getElementById('res-mimo').textContent = f(valMimo) + ' m²';
     document.getElementById('sub-mimo').textContent = subMimoText.replace(/\./g, ',');
     
-    document.getElementById('res-total').textContent = f(nad + mimo) + ' m²';
+    document.getElementById('res-total').textContent = f(valNad + valMimo) + ' m²';
     document.getElementById('txt-formula').textContent = formula;
   }
 
   function copyToClipboard() {
-    const s = document.getElementById('inp-sirka').value.replace('.', ',');
-    const h = document.getElementById('inp-hloubka').value.replace('.', ',');
+    // Formátování čísel pro export (čárka místo tečky)
+    const nad = valNad.toFixed(2).replace('.', ',');
+    const mimo = valMimo.toFixed(2).replace('.', ',');
+    
     const typeLabel = currentTyp === 'zelen' ? 'v zeleni' : currentSurface;
     
-    let textToCopy = "";
-    
-    if (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo)) {
-        // Pro zeleň a štěrk s hloubkou: povrch [Enter] šířka/hloubka
-        textToCopy = `${typeLabel}\n${s}/${h}`;
-    } else {
-        // Pro asfalt a dlažby: povrch [Enter] šířka/0,5
-        textToCopy = `${typeLabel}\n${s}/0,5`;
-    }
+    // Výsledný text:
+    // povrch
+    // plocha_nad/plocha_mimo
+    const textToCopy = `${typeLabel}\n${nad}/${mimo}`;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const btn = document.querySelector('.copy-btn');
