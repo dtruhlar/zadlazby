@@ -91,7 +91,6 @@
     .tog-btn strong { display: block; font-size: 14px; font-family: 'Syne'; }
     .tog-btn span { font-size: 10px; font-family: 'DM Mono'; opacity: 0.7; }
 
-    /* Volba povrchu */
     .surface-selector { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
@@ -116,7 +115,6 @@
     }
     .surf-btn.active { background: var(--suas-light-blue); color: white; border-color: var(--suas-light-blue); }
 
-    /* Sterk Option Slider */
     .sterk-option {
       display: flex;
       justify-content: space-between;
@@ -180,7 +178,6 @@
       transition: 0.2s;
     }
     .copy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-    .copy-btn:active { transform: translateY(0); }
 
     footer { text-align: center; margin-top: 10px; padding: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
 
@@ -228,9 +225,9 @@
         <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
         
         <div id="sterk-toggle" class="sterk-option" style="display:none">
-          <span>Počítat i mimo výkop?</span>
+          <span>Počítat i mimo výkop (dle hloubky)?</span>
           <div class="theme-switch" onclick="toggleSterkMimo()">
-            <div class="switch-bg" id="sterk-bg"><div class="switch-dot" id="sterk-dot"></div></div>
+            <div class="switch-bg" id="sterk-bg" style="background:var(--suas-green)"><div class="switch-dot" id="sterk-dot" style="transform:translateX(18px)"></div></div>
           </div>
         </div>
       </div>
@@ -302,8 +299,7 @@
     currentTyp = t;
     document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
     document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
-    document.getElementById('h-wrap').style.display = (t === 'zelen' ? 'block' : 'none');
-    document.getElementById('surface-section').style.display = (t === 'ostatni' ? 'grid' : 'none');
+    updateVisibility();
     calc();
   }
 
@@ -312,14 +308,27 @@
     document.querySelectorAll('.surf-btn').forEach(btn => {
       btn.classList.toggle('active', btn.textContent === s);
     });
-    document.getElementById('sterk-toggle').style.display = (s === 'štěrk' ? 'flex' : 'none');
+    updateVisibility();
     calc();
+  }
+
+  function updateVisibility() {
+    // Hloubka se ukáže pokud: je to v Zeleni NEBO je to Ostatní + Štěrk + Aktivní přepínač
+    const showH = (currentTyp === 'zelen') || (currentTyp === 'ostatni' && currentSurface === 'štěrk' && sterkMimo);
+    document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
+    
+    // Povrchy se ukážou jen u "Ostatní"
+    document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
+    
+    // Přepínač štěrku jen u povrchu "štěrk"
+    document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' ? 'flex' : 'none');
   }
 
   function toggleSterkMimo() {
     sterkMimo = !sterkMimo;
     document.getElementById('sterk-dot').style.transform = sterkMimo ? 'translateX(18px)' : 'translateX(0)';
     document.getElementById('sterk-bg').style.background = sterkMimo ? 'var(--suas-green)' : 'var(--border)';
+    updateVisibility();
     calc();
   }
 
@@ -331,21 +340,30 @@
     const nad = d * s;
     let mimo = 0;
     let formula = "";
-    let subMimo = "";
+    let subMimoText = "";
 
     if (currentTyp === 'ostatni') {
-      // Speciální logika pro štěrk
-      if (currentSurface === 'štěrk' && !sterkMimo) {
+      if (currentSurface === 'štěrk' && sterkMimo) {
+        // Logika jako u zeleně
+        const koef = (s + h + 0.6);
+        mimo = d * koef;
+        subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
+        formula = `Vzorec (Štěrk s hloubkou): (D × Š) + (D × (Š + H + 0,6))`;
+      } else if (currentSurface === 'štěrk' && !sterkMimo) {
         mimo = 0;
+        subMimoText = "0,00";
+        formula = `Vzorec: D × Š (bez přídavné plochy)`;
       } else {
+        // Standardní ostatní (asfalt, dlažba)
         mimo = d * 0.5;
+        subMimoText = `${d.toFixed(2)} × 0,50`;
+        formula = `Vzorec: (D × Š) + (D × 0,5)`;
       }
-      subMimo = `${d.toFixed(2)} × 0,50`;
-      formula = `Vzorec: (D × Š) + ${mimo > 0 ? '(D × 0,5)' : '0'}`;
     } else {
+      // V zeleni
       const koef = (s + h + 0.6);
       mimo = d * koef;
-      subMimo = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
+      subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
       formula = `Vzorec: (D × Š) + (D × (Š + H + 0,6))`;
     }
 
@@ -356,7 +374,7 @@
     
     document.getElementById('box-mimo').style.opacity = mimo === 0 ? '0.3' : '1';
     document.getElementById('res-mimo').textContent = f(mimo) + ' m²';
-    document.getElementById('sub-mimo').textContent = subMimo.replace(/\./g, ',');
+    document.getElementById('sub-mimo').textContent = subMimoText.replace(/\./g, ',');
     
     document.getElementById('res-total').textContent = f(nad + mimo) + ' m²';
     document.getElementById('txt-formula').textContent = formula;
@@ -364,25 +382,27 @@
 
   function copyToClipboard() {
     const s = document.getElementById('inp-sirka').value.replace('.', ',');
+    const h = document.getElementById('inp-hloubka').value.replace('.', ',');
     const typeLabel = currentTyp === 'zelen' ? 'v zeleni' : currentSurface;
     
-    // Formátování: Povrch [Enter] Šířka/0,5
-    // Pokud je to v zeleni, šířka zůstává, přesah je dle vzorce, ale pro zjednodušení textu dle zadání:
-    const textToCopy = `${typeLabel}\n${s}/0,5`;
+    let textToCopy = "";
+    
+    if (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo)) {
+        // Pro zeleň a štěrk s hloubkou: povrch [Enter] šířka/hloubka
+        textToCopy = `${typeLabel}\n${s}/${h}`;
+    } else {
+        // Pro asfalt a dlažby: povrch [Enter] šířka/0,5
+        textToCopy = `${typeLabel}\n${s}/0,5`;
+    }
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const btn = document.querySelector('.copy-btn');
       const originalText = btn.innerHTML;
       btn.innerHTML = "✅ Zkopírováno!";
-      btn.style.background = "var(--suas-blue)";
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.style.background = "var(--suas-green)";
-      }, 2000);
+      setTimeout(() => btn.innerHTML = originalText, 2000);
     });
   }
 
-  // Init
   calc();
 </script>
 
