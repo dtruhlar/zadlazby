@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulačka zádlažby</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #181c26;
+      --surface2: #1f2535;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.14);
+      --text: #f0f2f7;
+      --muted: #7a8499;
+      --accent: #4ade9f;
+      --accent2: #3bc87e;
+      --blue: #5b9cf6;
+      --blue-muted: rgba(91,156,246,0.15);
+      --green-muted: rgba(74,222,159,0.12);
+      --green-strong: rgba(74,222,159,0.22);
+      --radius: 12px;
+      --radius-lg: 18px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    /* Background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--green-muted);
+      border: 1px solid rgba(74,222,159,0.25);
+      padding: 4px 10px;
+      border-radius: 99px;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    h1 span { color: var(--accent); }
+    .subtitle {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .card:nth-child(2) { animation-delay: 0.08s; }
+    .card:nth-child(3) { animation-delay: 0.16s; }
+
+    /* Toggle */
+    .toggle-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 1.75rem;
+    }
+    .tog {
+      position: relative;
+      padding: 14px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      text-align: left;
+    }
+    .tog:hover { border-color: var(--border2); background: var(--surface2); color: var(--text); }
+    .tog.active {
+      background: var(--green-muted);
+      border-color: rgba(74,222,159,0.4);
+      color: var(--accent);
+    }
+    .tog .tog-icon {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+    .tog .tog-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .tog.active .tog-sub { color: rgba(74,222,159,0.6); }
+
+    /* Inputs */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .field.hidden {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-family: 'DM Mono', monospace;
+    }
+    .field label .lval {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .input-wrap:focus-within { border-color: rgba(74,222,159,0.5); }
+    .input-wrap input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .input-wrap input::placeholder { color: var(--muted); }
+    .input-wrap .unit {
+      padding: 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      border-left: 1px solid var(--border);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    /* Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 99px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 3px solid var(--surface);
+      box-shadow: 0 0 0 1px rgba(74,222,159,0.4);
+      transition: box-shadow 0.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 4px rgba(74,222,159,0.2);
+    }
+
+    .slider-row {
+      margin-bottom: 1.25rem;
+    }
+
+    /* Formula */
+    .formula-chip {
+      margin-top: 1.5rem;
+      padding: 12px 14px;
+      background: rgba(91,156,246,0.07);
+      border: 1px solid rgba(91,156,246,0.18);
+      border-radius: var(--radius);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #7aa4f7;
+      line-height: 1.7;
+    }
+    .formula-chip strong { color: var(--blue); font-weight: 500; }
+
+    /* Visual bar */
+    .vis-section { margin-bottom: 1.75rem; }
+    .vis-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 10px;
+    }
+    .vis-bar {
+      display: flex;
+      height: 52px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .vis-nad {
+      background: var(--blue-muted);
+      border-right: 1px solid rgba(91,156,246,0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+      min-width: 80px;
+    }
+    .vis-mimo {
+      flex: 1;
+      background: var(--green-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .vis-nad span, .vis-mimo span {
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      display: block;
+      text-align: center;
+    }
+    .vis-nad .vl { font-size: 12px; font-weight: 500; color: #7aa4f7; }
+    .vis-nad .vs { color: rgba(91,156,246,0.6); }
+    .vis-mimo .vl { font-size: 12px; font-weight: 500; color: var(--accent); }
+    .vis-mimo .vs { color: rgba(74,222,159,0.6); }
+
+    /* Results */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .res-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .res-card .rl {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+    .res-card .rv {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .res-card .rs {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .res-card.blue .rv { color: #7aa4f7; }
+    .res-card.green .rv { color: var(--accent); }
+
+    .total-card {
+      background: linear-gradient(135deg, var(--green-muted) 0%, rgba(91,156,246,0.08) 100%);
+      border: 1px solid rgba(74,222,159,0.3);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .total-card .tl {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .total-card .tv {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+    }
+    .total-card .ts {
+      font-size: 11px;
+      color: rgba(74,222,159,0.5);
+      font-family: 'DM Mono', monospace;
+      margin-top: 2px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 400px) {
+      .results-grid { grid-template-columns: 1fr; }
+      .tog { padding: 12px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="badge">Výpočet ploch</div>
+    <h1>Kalkulačka<br><span>zádlažby</span></h1>
+    <p class="subtitle">Výpočet plochy dlažby nad výkopem a mimo výkop</p>
+  </header>
+
+  <!-- Typ prostředí -->
+  <div class="card">
+    <div class="section-title">Typ prostředí</div>
+    <div class="toggle-wrap">
+      <button class="tog active" id="btn-ostatni" onclick="setTyp('ostatni')">
+        <span class="tog-icon">🏗️</span>
+        Ostatní
+        <span class="tog-sub">mimo výkop → 0,5 m</span>
+      </button>
+      <button class="tog" id="btn-zelen" onclick="setTyp('zelen')">
+        <span class="tog-icon">🌿</span>
+        V zeleni
+        <span class="tog-sub">mimo výkop → d×(š+h+0,6)</span>
+      </button>
+    </div>
+
+    <div class="section-title">Parametry výkopu</div>
+
+    <!-- Délka slider -->
+    <div class="slider-row">
+      <label class="field" style="margin:0 0 8px; display:flex; justify-content:space-between;">
+        <span style="font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;">délka výkopu</span>
+        <span style="font-size:13px;color:var(--text);font-family:'DM Mono',monospace;font-weight:500;" id="lbl-delka">10,0 m</span>
+      </label>
+      <input type="range" min="0.5" max="100" step="0.5" value="10" id="slider-delka" oninput="syncSlider('delka')">
+    </div>
+
+    <div class="field" id="field-delka">
+      <label><span>délka (přesně)</span><span class="lval" id="lval-delka">10,0 m</span></label>
+      <div class="input-wrap">
+        <input type="number" id="inp-delka" min="0" step="0.1" value="10" placeholder="0" oninput="syncInput('delka')">
+        <span class="unit">m</span>
+      </div>
+    </div>
+
+    <!-- Šířka -->
+    <div class="field" id="field-sirka">
+      <label><span>šířka výkopu</span><span class="lval" id="lval-sirka">0,65 m</span></label>
+      <div class="input-wrap">
+        <input type="number" id="inp-sirka" min="0" step="0.01" value="0.65" placeholder="0" oninput="calc()">
+        <span class="unit">m</span>
+      </div>
+    </div>
+
+    <!-- Hloubka (jen v zeleni) -->
+    <div class="field hidden" id="field-hloubka">
+      <label><span>hloubka výkopu</span><span class="lval" id="lval-hloubka">0,00 m</span></label>
+      <div class="input-wrap">
+        <input type="number" id="inp-hloubka" min="0" step="0.01" value="0" placeholder="0" oninput="calc()">
+        <span class="unit">m</span>
+      </div>
+    </div>
+
+    <div class="formula-chip" id="formula-box"></div>
+  </div>
+
+  <!-- Výsledky -->
+  <div class="card">
+    <div class="vis-section">
+      <div class="vis-label">Poměr ploch</div>
+      <div class="vis-bar">
+        <div class="vis-nad" id="bar-nad" style="width:57%">
+          <span class="vl" id="bar-nad-v">6,50 m²</span>
+          <span class="vs">nad výkopem</span>
+        </div>
+        <div class="vis-mimo">
+          <span class="vl" id="bar-mimo-v">5,00 m²</span>
+          <span class="vs">mimo výkop</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-grid">
+      <div class="res-card blue">
+        <div class="rl">NAD VÝKOPEM</div>
+        <div class="rv" id="res-nad">6,50 m²</div>
+        <div class="rs" id="sub-nad">10 × 0,65</div>
+      </div>
+      <div class="res-card green">
+        <div class="rl">MIMO VÝKOP</div>
+        <div class="rv" id="res-mimo">5,00 m²</div>
+        <div class="rs" id="sub-mimo">10 × 0,5</div>
+      </div>
+    </div>
+
+    <div class="total-card">
+      <div>
+        <div class="tl">CELKEM</div>
+        <div class="ts">nad + mimo výkop</div>
+      </div>
+      <div class="tv" id="res-total">11,50 m²</div>
+    </div>
+  </div>
+
+  <footer>kalkulačka zádlažby &nbsp;·&nbsp; v1.0</footer>
+
+</div>
+
+<script>
+  var typ = 'ostatni';
+
+  function fmt(n) {
+    return n.toFixed(2).replace('.', ',') + ' m²';
+  }
+  function fmtm(n) {
+    return n.toFixed(2).replace('.', ',') + ' m';
+  }
+
+  function setTyp(t) {
+    typ = t;
+    document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
+    document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
+    var fh = document.getElementById('field-hloubka');
+    if (t === 'zelen') { fh.classList.remove('hidden'); }
+    else { fh.classList.add('hidden'); }
+    calc();
+  }
+
+  function syncSlider(key) {
+    var val = parseFloat(document.getElementById('slider-' + key).value);
+    document.getElementById('inp-' + key).value = val;
+    document.getElementById('lbl-' + key).textContent = fmtm(val);
+    calc();
+  }
+
+  function syncInput(key) {
+    var val = parseFloat(document.getElementById('inp-' + key).value) || 0;
+    var slider = document.getElementById('slider-' + key);
+    if (slider) {
+      if (val > parseFloat(slider.max)) slider.max = val + 10;
+      slider.value = val;
+      document.getElementById('lbl-' + key).textContent = fmtm(val);
+    }
+    calc();
+  }
+
+  function calc() {
+    var d = parseFloat(document.getElementById('inp-delka').value) || 0;
+    var s = parseFloat(document.getElementById('inp-sirka').value) || 0;
+    var h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
+
+    document.getElementById('lval-delka').textContent = fmtm(d);
+    document.getElementById('lval-sirka').textContent = fmtm(s);
+    document.getElementById('lval-hloubka').textContent = fmtm(h);
+
+    var nad, mimo, formulaHtml, subMimo, siMimo;
+
+    nad = d * s;
+
+    if (typ === 'ostatni') {
+      mimo = d * 0.5;
+      subMimo = d.toFixed(2).replace('.',',') + ' × 0,5';
+      siMimo = 0.5;
+      formulaHtml =
+        'Nad výkopem: <strong>délka × šířka</strong><br>' +
+        'Mimo výkop:&nbsp; <strong>délka × 0,5 m</strong>';
+    } else {
+      siMimo = s + h + 0.6;
+      mimo = d * siMimo;
+      subMimo = d.toFixed(2).replace('.',',') + ' × (' + s.toFixed(2).replace('.',',') + ' + ' + h.toFixed(2).replace('.',',') + ' + 0,60)';
+      formulaHtml =
+        'Nad výkopem: <strong>délka × šířka</strong><br>' +
+        'Mimo výkop:&nbsp; <strong>délka × (šířka + hloubka + 0,6)</strong>';
+    }
+
+    var total = nad + mimo;
+
+    document.getElementById('res-nad').textContent = fmt(nad);
+    document.getElementById('sub-nad').textContent = d.toFixed(2).replace('.',',') + ' × ' + s.toFixed(2).replace('.',',');
+    document.getElementById('res-mimo').textContent = fmt(mimo);
+    document.getElementById('sub-mimo').textContent = subMimo;
+    document.getElementById('res-total').textContent = fmt(total);
+    document.getElementById('formula-box').innerHTML = formulaHtml;
+
+    document.getElementById('bar-nad-v').textContent = fmt(nad);
+    document.getElementById('bar-mimo-v').textContent = fmt(mimo);
+
+    if (total > 0) {
+      var pct = Math.max(15, Math.min(80, (nad / total * 100)));
+      document.getElementById('bar-nad').style.width = pct.toFixed(1) + '%';
+    }
+  }
+
+  setTyp('ostatni');
+</script>
+</body>
+</html>
