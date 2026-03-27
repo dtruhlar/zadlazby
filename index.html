@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kalkulačka zádlažby | SUAS GRID</title>
+  <title>SUAS GRID | Kalkulačka & Sumář</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,21 +11,21 @@
       --suas-light-blue: #0076C0;
       --suas-green: #37B34A;
       --suas-yellow: #C5D91B;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: var(--suas-blue);
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --input-bg: #f1f5f9;
-    }
-
-    body.dark-mode {
       --bg: #0f172a;
       --card: #1e293b;
       --text: #f1f5f9;
       --muted: #94a3b8;
       --border: #334155;
       --input-bg: #0f172a;
+    }
+
+    body.light-mode {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: var(--suas-blue);
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --input-bg: #f1f5f9;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,13 +36,36 @@
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       transition: background 0.3s;
       padding: 20px;
     }
 
     .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* MENU / NAVIGACE */
+    nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .nav-btn {
+      padding: 10px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'Syne';
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .nav-btn.active {
+      background: var(--suas-light-blue);
+      color: white;
+      border-color: var(--suas-light-blue);
+    }
 
     header {
       display: flex;
@@ -53,15 +76,19 @@
     }
 
     .logo-link { height: 75px; display: flex; align-items: center; }
-    .logo-img { height: 100%; width: auto; display: block; transition: filter 0.3s ease; }
-    body.dark-mode .logo-img { filter: brightness(0) invert(1); }
+    .logo-img { height: 100%; width: auto; display: block; filter: brightness(0) invert(1); transition: filter 0.3s ease; }
+    body.light-mode .logo-img { filter: none; }
 
     .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 
     .theme-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; }
     .switch-bg { width: 36px; height: 18px; background: var(--border); border-radius: 20px; position: relative; }
-    .switch-dot { width: 14px; height: 14px; background: var(--suas-light-blue); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    body.dark-mode .switch-dot { transform: translateX(18px); background: var(--suas-yellow); }
+    .switch-dot { width: 14px; height: 14px; background: var(--suas-yellow); border-radius: 50%; position: absolute; top: 2px; left: 18px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    body.light-mode .switch-dot { left: 2px; background: var(--suas-light-blue); }
+
+    .main-content { display: block; }
+    .page { display: none; }
+    .page.active { display: block; }
 
     .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 
@@ -70,217 +97,123 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 30px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
     }
 
     .section-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; }
 
+    /* INPUTY A BUTTONY */
     .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .tog-btn {
-      padding: 12px;
-      border: 2px solid var(--border);
-      background: transparent;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      color: var(--text);
-    }
+    .tog-btn { padding: 12px; border: 2px solid var(--border); background: transparent; border-radius: 12px; cursor: pointer; color: var(--text); }
     .tog-btn.active { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.1); }
-    .tog-btn strong { display: block; font-size: 14px; font-family: 'Syne'; }
-    .tog-btn span { font-size: 10px; font-family: 'DM Mono'; opacity: 0.7; }
-
-    .surface-selector { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 8px; 
-      margin-bottom: 20px; 
-      padding: 15px;
-      background: rgba(0,0,0,0.02);
-      border-radius: 15px;
-    }
-    body.dark-mode .surface-selector { background: rgba(255,255,255,0.03); }
-
-    .surf-btn {
-      padding: 10px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      transition: 0.2s;
-    }
+    
+    .surface-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; }
+    .surf-btn { padding: 10px; border: 1px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; font-size: 12px; color: var(--text); }
     .surf-btn.active { background: var(--suas-light-blue); color: white; border-color: var(--suas-light-blue); }
 
-    .sterk-option {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin-top: 5px;
-      font-size: 12px;
-      grid-column: span 2;
-      border-top: 1px solid var(--border);
-    }
-
-    .input-field { margin-bottom: 15px; }
-    .input-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-    .input-control {
-      display: flex;
-      background: var(--input-bg);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .input-control input {
-      flex: 1; border: none; background: transparent; padding: 14px; font-size: 20px; font-weight: 800; color: var(--text); outline: none; font-family: 'Inter';
-    }
+    .input-control { display: flex; background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 5px; }
+    .input-control input { flex: 1; border: none; background: transparent; padding: 14px; font-size: 20px; font-weight: 800; color: var(--text); outline: none; }
     .unit-tag { background: var(--border); padding: 14px; font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; }
 
-    .res-box {
-      padding: 22px;
-      border-radius: 14px;
-      margin-bottom: 15px;
-      background: rgba(0,0,0,0.02);
-      border-left: 6px solid var(--suas-light-blue);
-    }
-    .res-box.green { border-left-color: var(--suas-green); }
-    .res-label { font-family: 'DM Mono'; font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-    .res-value { font-family: 'Syne'; font-size: 32px; font-weight: 800; }
+    /* SUMÁŘ SPECIFICKÉ */
+    .summary-area { width: 100%; min-height: 200px; background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; resize: vertical; margin-bottom: 20px; }
+    
+    .sum-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .sum-table th { text-align: left; font-family: 'DM Mono'; font-size: 11px; color: var(--muted); padding: 10px; border-bottom: 1px solid var(--border); }
+    .sum-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-family: 'Inter'; font-weight: 600; }
+    .sum-row-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); font-weight: 800 !important; }
 
-    .total-highlight {
-      margin-top: auto;
-      background: linear-gradient(135deg, var(--suas-blue) 0%, var(--suas-light-blue) 100%);
-      color: white;
-      padding: 25px;
-      border-radius: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .total-val { font-family: 'Syne'; font-size: 36px; font-weight: 800; color: var(--suas-yellow); }
+    .res-box { padding: 22px; border-radius: 14px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border-left: 6px solid var(--suas-light-blue); }
+    .total-highlight { background: linear-gradient(135deg, var(--suas-blue) 0%, var(--suas-light-blue) 100%); color: white; padding: 25px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .copy-btn { width: 100%; margin-top: 15px; padding: 15px; background: var(--suas-green); color: white; border: none; border-radius: 12px; font-family: 'Syne'; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-    .copy-btn {
-      width: 100%;
-      margin-top: 15px;
-      padding: 15px;
-      background: var(--suas-green);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Syne';
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: 0.2s;
-    }
-    .copy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
-    footer { text-align: center; margin-top: 10px; padding: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
-
-    @media (max-width: 850px) {
-      header { flex-direction: column; gap: 20px; align-items: flex-start; }
-      .main-grid { grid-template-columns: 1fr; }
-    }
+    footer { text-align: center; margin-top: auto; padding: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); width: 100%; }
   </style>
 </head>
 <body>
 
-<body class="dark-mode"> <div class="app-container">
+<div class="app-container">
+  <nav>
+    <button class="nav-btn active" onclick="showPage('calc-page', this)">🏗️ Kalkulačka</button>
+    <button class="nav-btn" onclick="showPage('sum-page', this)">📊 Sumář ploch</button>
+  </nav>
+
   <header>
     <div class="logo-link">
       <img src="SUAS GRID LOGO.svg" alt="SUAS GRID" class="logo-img">
     </div>
     <div class="header-right">
-      <h1 style="font-family:'Syne'; font-weight:800; font-size:22px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
+      <h1 id="page-title" style="font-family:'Syne'; font-weight:800; font-size:22px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
       <div class="theme-switch" onclick="toggleTheme()">
-        <span>DARK MODE</span>
+        <span id="theme-text">LIGHT MODE</span>
         <div class="switch-bg"><div class="switch-dot"></div></div>
       </div>
     </div>
   </header>
 
-  <div class="main-grid">
-    <div class="card">
-      <span class="section-title">Parametry výkopu</span>
-      
-      <div class="toggle-group">
-        <button class="tog-btn active" id="btn-ostatni" onclick="setTyp('ostatni')">
-          <strong>🏗️ Ostatní</strong>
-          <span>Přesah + 0,5 m</span>
-        </button>
-        <button class="tog-btn" id="btn-zelen" onclick="setTyp('zelen')">
-          <strong>🌿 Zeleň</strong>
-          <span>D × (Š+H+0,6)</span>
-        </button>
-      </div>
-
-      <div id="surface-section" class="surface-selector">
-        <button class="surf-btn active" onclick="setSurface('asfalt')">asfalt</button>
-        <button class="surf-btn" onclick="setSurface('beton. dlažba')">beton. dlažba</button>
-        <button class="surf-btn" onclick="setSurface('kamenná dlažba')">kamenná dlažba</button>
-        <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
-        
-        <div id="sterk-toggle" class="sterk-option" style="display:none">
-          <span>Počítat i mimo výkop (dle hloubky)?</span>
-          <div class="theme-switch" onclick="toggleSterkMimo()">
-            <div class="switch-bg" id="sterk-bg" style="background:var(--suas-green)"><div class="switch-dot" id="sterk-dot" style="transform:translateX(18px)"></div></div>
+  <div class="main-content">
+    
+    <div id="calc-page" class="page active">
+      <div class="main-grid">
+        <div class="card">
+          <span class="section-title">Parametry výkopu</span>
+          <div class="toggle-group">
+            <button class="tog-btn active" id="btn-ostatni" onclick="setTyp('ostatni')"><strong>🏗️ Ostatní</strong><span>Přesah + 0,5 m</span></button>
+            <button class="tog-btn" id="btn-zelen" onclick="setTyp('zelen')"><strong>🌿 V zeleni</strong><span>D × (Š+H+0,6)</span></button>
           </div>
+          <div id="surface-section" class="surface-selector">
+            <button class="surf-btn active" onclick="setSurface('asfalt')">asfalt</button>
+            <button class="surf-btn" onclick="setSurface('beton. dlažba')">beton. dlažba</button>
+            <button class="surf-btn" onclick="setSurface('kamenná dlažba')">kamenná dlažba</button>
+            <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
+            <div id="sterk-toggle" style="display:none; grid-column: span 2; padding-top:10px; border-top:1px solid var(--border); margin-top:5px; font-size:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span>Mimo výkop dle hloubky?</span>
+              <div class="theme-switch" onclick="toggleSterkMimo()">
+                <div class="switch-bg" id="st-bg" style="background:var(--suas-green)"><div class="switch-dot" id="st-dot" style="left:18px"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="input-field"><div class="input-label" style="font-size:13px; font-weight:600">Délka (D)</div><div class="input-control"><input type="number" id="inp-delka" value="10" step="0.5" oninput="calc()"><span class="unit-tag">M</span></div></div>
+          <div class="input-field"><div class="input-label" style="font-size:13px; font-weight:600">Šířka (Š)</div><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.01" oninput="calc()"><span class="unit-tag">M</span></div></div>
+          <div class="input-field" id="h-wrap" style="display:none"><div class="input-label" style="font-size:13px; font-weight:600">Hloubka (H)</div><div class="input-control"><input type="number" id="inp-hloubka" value="0.80" step="0.01" oninput="calc()"><span class="unit-tag">M</span></div></div>
+          <div class="formula-info" id="txt-formula" style="margin-top:15px; font-family:'DM Mono'; font-size:11px; color:var(--muted); background:rgba(0,0,0,0.1); padding:10px; border-radius:8px;">Vzorec...</div>
+        </div>
+        <div class="card">
+          <span class="section-title">Výpočet ploch</span>
+          <div class="res-box"><div class="res-label" style="font-family:'DM Mono'; font-size:11px; color:var(--muted)">NAD VÝKOPEM</div><div class="res-value" id="res-nad" style="font-family:'Syne'; font-size:32px; font-weight:800">0,00 m²</div><div id="sub-nad" style="font-size:11px; font-family:'DM Mono'; color:var(--muted)">0 x 0</div></div>
+          <div class="res-box" id="box-mimo" style="border-left-color:var(--suas-green)"><div class="res-label" style="font-family:'DM Mono'; font-size:11px; color:var(--muted)">PŘÍDAVNÁ PLOCHA</div><div class="res-value" id="res-mimo" style="font-family:'Syne'; font-size:32px; font-weight:800">0,00 m²</div><div id="sub-mimo" style="font-size:11px; font-family:'DM Mono'; color:var(--muted)">0 x 0</div></div>
+          <div class="total-highlight"><div><div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8;">CELKEM</div></div><div id="res-total" style="font-family:'Syne'; font-size:36px; font-weight:800; color:var(--suas-yellow)">0,00 m²</div></div>
+          <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat pro sumář</button>
         </div>
       </div>
-
-      <div class="input-field">
-        <div class="input-label">Délka (D)</div>
-        <div class="input-control">
-          <input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()">
-          <span class="unit-tag">M</span>
-        </div>
-      </div>
-
-      <div class="input-field">
-        <div class="input-label">Šířka (Š)</div>
-        <div class="input-control">
-          <input type="number" id="inp-sirka" value="0.65" step="0.05" oninput="calc()">
-          <span class="unit-tag">M</span>
-        </div>
-      </div>
-
-      <div class="input-field" id="h-wrap" style="display:none">
-        <div class="input-label">Hloubka (H)</div>
-        <div class="input-control">
-          <input type="number" id="inp-hloubka" value="0.85" step="0.05" oninput="calc()">
-          <span class="unit-tag">M</span>
-        </div>
-      </div>
-
-      <div class="formula-info" id="txt-formula">Vzorec: (D × Š) + (D × 0,5)</div>
     </div>
 
-    <div class="card">
-      <span class="section-title">Výpočet ploch</span>
-      
-      <div class="res-box">
-        <div class="res-label">Nad výkopem</div>
-        <div class="res-value" id="res-nad">6,50 m²</div>
-        <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted);" id="sub-nad">10,00 × 0,65</div>
+    <div id="sum-page" class="page">
+      <div class="card">
+        <span class="section-title">Vložit data pro sečtení</span>
+        <textarea class="summary-area" id="sum-input" placeholder="Zde vložte zkopírovaná data...&#10;Příklad:&#10;asfalt&#10;6,50/5,00&#10;zeleň&#10;10,00/32,50" oninput="processSummary()"></textarea>
+        
+        <span class="section-title">Výsledný sumář</span>
+        <div id="summary-results">
+          <table class="sum-table">
+            <thead>
+              <tr>
+                <th>POVRCH / TYP</th>
+                <th>NAD VÝKOPEM (m²)</th>
+                <th>MIMO VÝKOP (m²)</th>
+                <th>CELKEM (m²)</th>
+              </tr>
+            </thead>
+            <tbody id="sum-body">
+              <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:40px;">Zatím nebyla vložena žádná data</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <div class="res-box green" id="box-mimo">
-        <div class="res-label">Přídavná plocha</div>
-        <div class="res-value" id="res-mimo">5,00 m²</div>
-        <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted);" id="sub-mimo">10,00 × 0,50</div>
-      </div>
-
-      <div class="total-highlight">
-        <div><div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8;">CELKEM</div></div>
-        <div class="total-val" id="res-total">11,50 m²</div>
-      </div>
-
-      <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat výsledek</button>
     </div>
+
   </div>
 
   <footer>
@@ -292,12 +225,21 @@
   let currentTyp = 'ostatni';
   let currentSurface = 'asfalt';
   let sterkMimo = true;
-
-  // Globální proměnné pro číselné výsledky k uložení
   let valNad = 0;
   let valMimo = 0;
 
-  function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+  function showPage(pageId, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    btn.classList.add('active');
+    document.getElementById('page-title').innerHTML = pageId === 'calc-page' ? 'Kalkulačka <span style="color:var(--suas-green)">zádlažby</span>' : 'Sumář <span style="color:var(--suas-green)">ploch</span>';
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    document.getElementById('theme-text').textContent = document.body.classList.contains('light-mode') ? 'DARK MODE' : 'LIGHT MODE';
+  }
 
   function setTyp(t) {
     currentTyp = t;
@@ -309,9 +251,7 @@
 
   function setSurface(s) {
     currentSurface = s;
-    document.querySelectorAll('.surf-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.textContent === s);
-    });
+    document.querySelectorAll('.surf-btn').forEach(btn => btn.classList.toggle('active', btn.textContent === s));
     updateVisibility();
     calc();
   }
@@ -325,8 +265,8 @@
 
   function toggleSterkMimo() {
     sterkMimo = !sterkMimo;
-    document.getElementById('sterk-dot').style.transform = sterkMimo ? 'translateX(18px)' : 'translateX(0)';
-    document.getElementById('sterk-bg').style.background = sterkMimo ? 'var(--suas-green)' : 'var(--border)';
+    document.getElementById('st-dot').style.left = sterkMimo ? '18px' : '2px';
+    document.getElementById('st-bg').style.background = sterkMimo ? 'var(--suas-green)' : 'var(--border)';
     updateVisibility();
     calc();
   }
@@ -335,68 +275,78 @@
     const d = parseFloat(document.getElementById('inp-delka').value) || 0;
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
-
     valNad = d * s;
-    let formula = "";
-    let subMimoText = "";
-
     if (currentTyp === 'ostatni') {
-      if (currentSurface === 'štěrk' && sterkMimo) {
-        const koef = (s + h + 0.6);
-        valMimo = d * koef;
-        subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
-        formula = `Vzorec (Štěrk s hloubkou): (D × Š) + (D × (Š + H + 0,6))`;
-      } else if (currentSurface === 'štěrk' && !sterkMimo) {
-        valMimo = 0;
-        subMimoText = "0,00";
-        formula = `Vzorec: D × Š (bez přídavné plochy)`;
-      } else {
-        valMimo = d * 0.5;
-        subMimoText = `${d.toFixed(2)} × 0,50`;
-        formula = `Vzorec: (D × Š) + (D × 0,5)`;
-      }
-    } else {
-      const koef = (s + h + 0.6);
-      valMimo = d * koef;
-      subMimoText = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
-      formula = `Vzorec: (D × Š) + (D × (Š + H + 0,6))`;
-    }
-
+      if (currentSurface === 'štěrk' && sterkMimo) { valMimo = d * (s + h + 0.6); }
+      else if (currentSurface === 'štěrk' && !sterkMimo) { valMimo = 0; }
+      else { valMimo = d * 0.5; }
+    } else { valMimo = d * (s + h + 0.6); }
     const f = (n) => n.toFixed(2).replace('.', ',');
-
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
-    document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
-    
-    document.getElementById('box-mimo').style.opacity = valMimo === 0 ? '0.3' : '1';
     document.getElementById('res-mimo').textContent = f(valMimo) + ' m²';
-    document.getElementById('sub-mimo').textContent = subMimoText.replace(/\./g, ',');
-    
     document.getElementById('res-total').textContent = f(valNad + valMimo) + ' m²';
-    document.getElementById('txt-formula').textContent = formula;
+    document.getElementById('txt-formula').textContent = currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo) ? `Vzorec: (D×Š) + (D × (Š+H+0,6))` : `Vzorec: (D×Š) + (D×0,5)`;
   }
 
   function copyToClipboard() {
-    // Formátování čísel pro export (čárka místo tečky)
-    const nad = valNad.toFixed(2).replace('.', ',');
-    const mimo = valMimo.toFixed(2).replace('.', ',');
-    
-    const typeLabel = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
-    
-    // Výsledný text:
-    // povrch
-    // plocha_nad/plocha_mimo
-    const textToCopy = `${typeLabel}\n${nad}/${mimo}`;
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "✅ Zkopírováno!";
-      setTimeout(() => btn.innerHTML = originalText, 2000);
+    const n = valNad.toFixed(2).replace('.', ',');
+    const m = valMimo.toFixed(2).replace('.', ',');
+    const label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
+    navigator.clipboard.writeText(`${label}\n${n}/${m}`).then(() => {
+      const b = document.querySelector('.copy-btn');
+      b.textContent = "✅ ZKOPÍROVÁNO";
+      setTimeout(() => b.textContent = "📋 Kopírovat pro sumář", 1500);
     });
+  }
+
+  function processSummary() {
+    const input = document.getElementById('sum-input').value;
+    const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
+    const totals = {};
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes('/')) {
+        const label = lines[i-1] || "neznámé";
+        const parts = lines[i].split('/');
+        const n = parseFloat(parts[0].replace(',', '.')) || 0;
+        const m = parseFloat(parts[1].replace(',', '.')) || 0;
+        if (!totals[label]) totals[label] = { nad: 0, mimo: 0 };
+        totals[label].nad += n;
+        totals[label].mimo += m;
+      }
+    }
+
+    const body = document.getElementById('sum-body');
+    body.innerHTML = "";
+    let grandNad = 0, grandMimo = 0;
+
+    const sortedKeys = Object.keys(totals).sort();
+    if (sortedKeys.length === 0) {
+      body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:40px;">Vložte platná data</td></tr>';
+      return;
+    }
+
+    sortedKeys.forEach(key => {
+      const d = totals[key];
+      grandNad += d.nad; grandMimo += d.mimo;
+      const row = `<tr>
+        <td>${key}</td>
+        <td>${d.nad.toFixed(2).replace('.', ',')}</td>
+        <td>${d.mimo.toFixed(2).replace('.', ',')}</td>
+        <td style="color:var(--suas-light-blue)">${(d.nad + d.mimo).toFixed(2).replace('.', ',')}</td>
+      </tr>`;
+      body.innerHTML += row;
+    });
+
+    body.innerHTML += `<tr class="sum-row-total">
+      <td>CELKOVÝ SOUČET</td>
+      <td>${grandNad.toFixed(2).replace('.', ',')}</td>
+      <td>${grandMimo.toFixed(2).replace('.', ',')}</td>
+      <td>${(grandNad + grandMimo).toFixed(2).replace('.', ',')} m²</td>
+    </tr>`;
   }
 
   calc();
 </script>
-
 </body>
 </html>
