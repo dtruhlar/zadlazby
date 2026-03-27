@@ -7,19 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* SUAS GRID PALETTE */
       --suas-blue: #00335F;
       --suas-light-blue: #0076C0;
       --suas-green: #37B34A;
       --suas-yellow: #C5D91B;
-      
-      /* LIGHT MODE */
       --bg: #f8fafc;
       --card: #ffffff;
       --text: var(--suas-blue);
       --muted: #64748b;
       --border: #e2e8f0;
-      --accent: var(--suas-green);
       --input-bg: #f1f5f9;
     }
 
@@ -29,7 +25,6 @@
       --text: #f1f5f9;
       --muted: #94a3b8;
       --border: #334155;
-      --accent: #4ade80;
       --input-bg: #0f172a;
     }
 
@@ -47,13 +42,7 @@
       padding: 20px;
     }
 
-    .app-container {
-      width: 100%;
-      max-width: 1100px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 20px; }
 
     header {
       display: flex;
@@ -63,66 +52,18 @@
       border-bottom: 2px solid var(--border);
     }
 
-    /* STYL PRO NAČTENÉ SVG */
-    .logo-link {
-      height: 75px;
-      display: flex;
-      align-items: center;
-    }
+    .logo-link { height: 75px; display: flex; align-items: center; }
+    .logo-img { height: 100%; width: auto; display: block; transition: filter 0.3s ease; }
+    body.dark-mode .logo-img { filter: brightness(0) invert(1); }
 
-    .logo-img {
-      height: 100%;
-      width: auto;
-      display: block;
-      transition: filter 0.3s ease;
-    }
+    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 
-    /* V Dark Mode invertujeme tmavé části SVG na světlé */
-    body.dark-mode .logo-img {
-      filter: brightness(0) invert(1);
-    }
-
-    .header-right {
-      text-align: right;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-    }
-
-    .theme-switch {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 800;
-      font-family: 'DM Mono', monospace;
-    }
-    .switch-bg {
-      width: 36px;
-      height: 18px;
-      background: var(--border);
-      border-radius: 20px;
-      position: relative;
-    }
-    .switch-dot {
-      width: 14px;
-      height: 14px;
-      background: var(--suas-light-blue);
-      border-radius: 50%;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .theme-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; }
+    .switch-bg { width: 36px; height: 18px; background: var(--border); border-radius: 20px; position: relative; }
+    .switch-dot { width: 14px; height: 14px; background: var(--suas-light-blue); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     body.dark-mode .switch-dot { transform: translateX(18px); background: var(--suas-yellow); }
 
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 25px;
-    }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 
     .card {
       background: var(--card);
@@ -134,29 +75,58 @@
       flex-direction: column;
     }
 
-    .section-title {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      letter-spacing: 0.05em;
-    }
+    .section-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; }
 
-    .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+    .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
     .tog-btn {
-      padding: 15px;
+      padding: 12px;
       border: 2px solid var(--border);
       background: transparent;
       border-radius: 12px;
       cursor: pointer;
-      text-align: left;
       transition: 0.2s;
       color: var(--text);
     }
     .tog-btn.active { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.1); }
-    .tog-btn strong { display: block; font-size: 15px; margin-bottom: 4px; font-family: 'Syne'; }
-    .tog-btn span { font-size: 11px; font-family: 'DM Mono'; opacity: 0.7; }
+    .tog-btn strong { display: block; font-size: 14px; font-family: 'Syne'; }
+    .tog-btn span { font-size: 10px; font-family: 'DM Mono'; opacity: 0.7; }
+
+    /* Volba povrchu */
+    .surface-selector { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 8px; 
+      margin-bottom: 20px; 
+      padding: 15px;
+      background: rgba(0,0,0,0.02);
+      border-radius: 15px;
+    }
+    body.dark-mode .surface-selector { background: rgba(255,255,255,0.03); }
+
+    .surf-btn {
+      padding: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      transition: 0.2s;
+    }
+    .surf-btn.active { background: var(--suas-light-blue); color: white; border-color: var(--suas-light-blue); }
+
+    /* Sterk Option Slider */
+    .sterk-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 12px;
+      grid-column: span 2;
+      border-top: 1px solid var(--border);
+    }
 
     .input-field { margin-bottom: 15px; }
     .input-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
@@ -187,28 +157,35 @@
       margin-top: auto;
       background: linear-gradient(135deg, var(--suas-blue) 0%, var(--suas-light-blue) 100%);
       color: white;
-      padding: 30px;
+      padding: 25px;
       border-radius: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .total-val { font-family: 'Syne'; font-size: 42px; font-weight: 800; color: var(--suas-yellow); }
+    .total-val { font-family: 'Syne'; font-size: 36px; font-weight: 800; color: var(--suas-yellow); }
 
-    .formula-info {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
+    .copy-btn {
+      width: 100%;
       margin-top: 15px;
-      color: var(--muted);
-      padding: 12px;
-      background: rgba(0,0,0,0.03);
-      border-radius: 10px;
+      padding: 15px;
+      background: var(--suas-green);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne';
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: 0.2s;
     }
+    .copy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+    .copy-btn:active { transform: translateY(0); }
+
+    footer { text-align: center; margin-top: 10px; padding: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
 
     @media (max-width: 850px) {
       header { flex-direction: column; gap: 20px; align-items: flex-start; }
-      .logo-link { height: 60px; }
-      .header-right { align-items: flex-start; text-align: left; }
       .main-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -220,7 +197,6 @@
     <div class="logo-link">
       <img src="SUAS GRID LOGO.svg" alt="SUAS GRID" class="logo-img">
     </div>
-    
     <div class="header-right">
       <h1 style="font-family:'Syne'; font-weight:800; font-size:22px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
       <div class="theme-switch" onclick="toggleTheme()">
@@ -243,6 +219,20 @@
           <strong>🌿 V zeleni</strong>
           <span>D × (Š+H+0,6)</span>
         </button>
+      </div>
+
+      <div id="surface-section" class="surface-selector">
+        <button class="surf-btn active" onclick="setSurface('asfalt')">asfalt</button>
+        <button class="surf-btn" onclick="setSurface('beton. dlažba')">beton. dlažba</button>
+        <button class="surf-btn" onclick="setSurface('kamenná dlažba')">kamenná dlažba</button>
+        <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
+        
+        <div id="sterk-toggle" class="sterk-option" style="display:none">
+          <span>Počítat i mimo výkop?</span>
+          <div class="theme-switch" onclick="toggleSterkMimo()">
+            <div class="switch-bg" id="sterk-bg"><div class="switch-dot" id="sterk-dot"></div></div>
+          </div>
+        </div>
       </div>
 
       <div class="input-field">
@@ -281,20 +271,21 @@
         <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted);" id="sub-nad">10,00 × 0,65</div>
       </div>
 
-      <div class="res-box green">
+      <div class="res-box green" id="box-mimo">
         <div class="res-label">Přídavná plocha</div>
         <div class="res-value" id="res-mimo">5,00 m²</div>
         <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted);" id="sub-mimo">10,00 × 0,50</div>
       </div>
 
       <div class="total-highlight">
-        <div>
-          <div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8;">CELKEM</div>
-        </div>
+        <div><div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8;">CELKEM</div></div>
         <div class="total-val" id="res-total">11,50 m²</div>
       </div>
+
+      <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat výsledek</button>
     </div>
   </div>
+
   <footer>
     © 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; verze 1.3
   </footer>
@@ -302,16 +293,33 @@
 
 <script>
   let currentTyp = 'ostatni';
+  let currentSurface = 'asfalt';
+  let sterkMimo = true;
 
-  function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-  }
+  function toggleTheme() { document.body.classList.toggle('dark-mode'); }
 
   function setTyp(t) {
     currentTyp = t;
     document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
     document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
     document.getElementById('h-wrap').style.display = (t === 'zelen' ? 'block' : 'none');
+    document.getElementById('surface-section').style.display = (t === 'ostatni' ? 'grid' : 'none');
+    calc();
+  }
+
+  function setSurface(s) {
+    currentSurface = s;
+    document.querySelectorAll('.surf-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent === s);
+    });
+    document.getElementById('sterk-toggle').style.display = (s === 'štěrk' ? 'flex' : 'none');
+    calc();
+  }
+
+  function toggleSterkMimo() {
+    sterkMimo = !sterkMimo;
+    document.getElementById('sterk-dot').style.transform = sterkMimo ? 'translateX(18px)' : 'translateX(0)';
+    document.getElementById('sterk-bg').style.background = sterkMimo ? 'var(--suas-green)' : 'var(--border)';
     calc();
   }
 
@@ -321,12 +329,19 @@
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
 
     const nad = d * s;
-    let mimo, formula, subMimo;
+    let mimo = 0;
+    let formula = "";
+    let subMimo = "";
 
     if (currentTyp === 'ostatni') {
-      mimo = d * 0.5;
+      // Speciální logika pro štěrk
+      if (currentSurface === 'štěrk' && !sterkMimo) {
+        mimo = 0;
+      } else {
+        mimo = d * 0.5;
+      }
       subMimo = `${d.toFixed(2)} × 0,50`;
-      formula = `Vzorec: (D × Š) + (D × 0,5)`;
+      formula = `Vzorec: (D × Š) + ${mimo > 0 ? '(D × 0,5)' : '0'}`;
     } else {
       const koef = (s + h + 0.6);
       mimo = d * koef;
@@ -338,11 +353,36 @@
 
     document.getElementById('res-nad').textContent = f(nad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
+    
+    document.getElementById('box-mimo').style.opacity = mimo === 0 ? '0.3' : '1';
     document.getElementById('res-mimo').textContent = f(mimo) + ' m²';
     document.getElementById('sub-mimo').textContent = subMimo.replace(/\./g, ',');
+    
     document.getElementById('res-total').textContent = f(nad + mimo) + ' m²';
     document.getElementById('txt-formula').textContent = formula;
   }
+
+  function copyToClipboard() {
+    const s = document.getElementById('inp-sirka').value.replace('.', ',');
+    const typeLabel = currentTyp === 'zelen' ? 'v zeleni' : currentSurface;
+    
+    // Formátování: Povrch [Enter] Šířka/0,5
+    // Pokud je to v zeleni, šířka zůstává, přesah je dle vzorce, ale pro zjednodušení textu dle zadání:
+    const textToCopy = `${typeLabel}\n${s}/0,5`;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "✅ Zkopírováno!";
+      btn.style.background = "var(--suas-blue)";
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = "var(--suas-green)";
+      }, 2000);
+    });
+  }
+
+  // Init
   calc();
 </script>
 
