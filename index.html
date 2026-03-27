@@ -11,7 +11,7 @@
       --suas-light-blue: #0076C0;
       --suas-green: #37B34A;
       --suas-yellow: #C5D91B;
-      --bg: #0f172a; /* Výchozí Dark Mode */
+      --bg: #0f172a;
       --card: #1e293b;
       --text: #f1f5f9;
       --muted: #94a3b8;
@@ -42,12 +42,11 @@
       padding: 20px;
     }
 
-    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 20px; }
+    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 15px; }
 
-    /* MENU */
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 5px; }
+    .nav-tabs { display: flex; gap: 8px; }
     .nav-tab {
-      padding: 12px 25px;
+      padding: 12px 20px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px 12px 0 0;
@@ -64,31 +63,33 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       border-bottom: 2px solid var(--border);
+      margin-bottom: 5px;
     }
 
-    .logo-link { height: 75px; display: flex; align-items: center; }
-    .logo-img { height: 100%; width: auto; display: block; filter: brightness(0) invert(1); }
+    .logo-img { height: 55px; width: auto; filter: brightness(0) invert(1); }
     body.light-mode .logo-img { filter: none; }
 
-    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
 
-    .theme-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; }
-    .switch-bg { width: 36px; height: 18px; background: var(--border); border-radius: 20px; position: relative; }
-    .switch-dot { width: 14px; height: 14px; background: var(--suas-yellow); border-radius: 50%; position: absolute; top: 2px; right: 2px; transition: 0.3s; }
-    body.light-mode .switch-dot { right: 18px; background: var(--suas-light-blue); }
+    .theme-switch, .sub-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; }
+    .switch-bg { width: 36px; height: 18px; background: var(--border); border-radius: 20px; position: relative; transition: 0.3s; }
+    .switch-dot { width: 14px; height: 14px; background: var(--suas-yellow); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
+    
+    .active-switch .switch-bg { background: var(--suas-green) !important; }
+    .active-switch .switch-dot { left: 20px !important; }
 
     .page { display: none; }
     .page.active { display: block; }
 
-    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 30px;
+      padding: 25px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
@@ -96,74 +97,59 @@
 
     .section-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; }
 
-    /* KALKULAČKA PRVKY */
-    .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .tog-btn {
-      padding: 12px;
-      border: 2px solid var(--border);
-      background: transparent;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      color: var(--text);
+      padding: 10px; border: 2px solid var(--border); background: transparent; border-radius: 12px;
+      cursor: pointer; color: var(--text); transition: 0.2s; text-align: left;
     }
+    .tog-btn strong { display: block; font-family: 'Syne'; font-size: 14px; }
+    .tog-btn span { font-size: 10px; opacity: 0.6; font-family: 'DM Mono'; }
     .tog-btn.active { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.1); }
-    .tog-btn strong { display: block; font-size: 14px; font-family: 'Syne'; }
-    .tog-btn span { font-size: 10px; font-family: 'DM Mono'; opacity: 0.7; }
 
     .surface-selector { 
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; padding: 15px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; padding: 12px;
       background: rgba(255,255,255,0.03); border-radius: 15px;
     }
-    body.light-mode .surface-selector { background: rgba(0,0,0,0.02); }
-
     .surf-btn {
-      padding: 10px; border: 1px solid var(--border); background: var(--card); border-radius: 8px;
-      cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text); transition: 0.2s;
+      padding: 10px 5px; border: 1px solid var(--border); background: var(--card); border-radius: 8px;
+      cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text); transition: 0.2s;
     }
     .surf-btn.active { background: var(--suas-light-blue); color: white; border-color: var(--suas-light-blue); }
 
-    .input-field { margin-bottom: 15px; }
-    .input-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
     .input-control {
-      display: flex; background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden;
+      display: flex; background: var(--input-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px;
     }
     .input-control input {
-      flex: 1; border: none; background: transparent; padding: 14px; font-size: 20px; font-weight: 800; color: var(--text); outline: none; font-family: 'Inter';
+      flex: 1; border: none; background: transparent; padding: 12px; font-size: 18px; font-weight: 800; color: var(--text); outline: none;
     }
-    .unit-tag { background: var(--border); padding: 14px; font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; }
+    .unit-tag { background: var(--border); padding: 12px; font-size: 10px; font-weight: 800; color: var(--muted); display: flex; align-items: center; min-width: 85px; justify-content: center; }
 
-    .res-box {
-      padding: 22px; border-radius: 14px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border-left: 6px solid var(--suas-light-blue);
-    }
+    .res-box { padding: 15px; border-radius: 12px; margin-bottom: 10px; background: rgba(255,255,255,0.02); border-left: 5px solid var(--suas-light-blue); }
     .res-box.green { border-left-color: var(--suas-green); }
-    .res-label { font-family: 'DM Mono'; font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-    .res-value { font-family: 'Syne'; font-size: 32px; font-weight: 800; }
+    .res-label { font-size: 10px; font-family: 'DM Mono'; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .res-value { font-family: 'Syne'; font-size: 28px; font-weight: 800; }
 
     .total-highlight {
       margin-top: auto; background: linear-gradient(135deg, var(--suas-blue) 0%, var(--suas-light-blue) 100%);
-      color: white; padding: 25px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
+      color: white; padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
     }
-    .total-val { font-family: 'Syne'; font-size: 36px; font-weight: 800; color: var(--suas-yellow); }
+    .total-val { font-family: 'Syne'; font-size: 32px; font-weight: 800; color: var(--suas-yellow); }
 
     .copy-btn {
       width: 100%; margin-top: 15px; padding: 15px; background: var(--suas-green); color: white;
       border: none; border-radius: 12px; font-family: 'Syne'; font-weight: 800; cursor: pointer; text-transform: uppercase;
     }
 
-    /* SUMÁŘ PRVKY */
     .summary-textarea {
-      width: 100%; min-height: 250px; background: var(--input-bg); border: 2px solid var(--border);
-      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical; margin-bottom: 20px;
+      width: 100%; min-height: 220px; background: var(--input-bg); border: 2px solid var(--border);
+      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical; margin-bottom: 15px;
     }
-    .sum-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .sum-table th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-family: 'DM Mono'; font-size: 11px; color: var(--muted); }
-    .sum-table td { padding: 15px 12px; border-bottom: 1px solid var(--border); font-weight: 600; }
-    .row-grand-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); font-size: 18px; }
+    .sum-table { width: 100%; border-collapse: collapse; }
+    .sum-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-family: 'DM Mono'; }
+    .sum-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
+    .row-grand-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); }
 
-    footer { text-align: center; margin-top: 20px; padding: 20px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
-
-    @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } .surface-selector { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body class="dark-mode">
@@ -175,14 +161,12 @@
   </div>
 
   <header>
-    <div class="logo-link">
-      <img src="SUAS GRID LOGO.svg" alt="SUAS GRID" class="logo-img">
-    </div>
+    <img src="SUAS GRID LOGO.svg" alt="SUAS GRID" class="logo-img">
     <div class="header-right">
-      <h1 style="font-family:'Syne'; font-weight:800; font-size:22px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
+      <h1 style="font-family:'Syne'; font-weight:800; font-size:20px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
       <div class="theme-switch" onclick="toggleTheme()">
         <span id="theme-label">LIGHT MODE</span>
-        <div class="switch-bg"><div class="switch-dot"></div></div>
+        <div class="switch-bg" id="theme-bg"><div class="switch-dot"></div></div>
       </div>
     </div>
   </header>
@@ -200,27 +184,37 @@
           <button class="surf-btn active" onclick="setSurface('asfalt')">asfalt</button>
           <button class="surf-btn" onclick="setSurface('beton. dlažba')">beton. dlažba</button>
           <button class="surf-btn" onclick="setSurface('kamenná dlažba')">kamenná dlažba</button>
+          <button class="surf-btn" onclick="setSurface('zámková dlažba')">zámková dlažba</button>
+          <button class="surf-btn" onclick="setSurface('mozaika')">mozaika</button>
           <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
           
-          <div id="sterk-toggle" style="display:none; grid-column: span 2; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); margin-top: 5px; font-size: 12px;">
-            <span>Počítat i mimo výkop (dle hloubky)?</span>
-            <div class="theme-switch" onclick="toggleSterkMimo()">
-              <div class="switch-bg" id="st-bg" style="background:var(--suas-green)"><div class="switch-dot" id="st-dot" style="right:2px"></div></div>
+          <div id="chodnik-wrap" style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
+             <span style="font-size: 11px; font-weight: 700;">Konstrukce:</span>
+             <div class="sub-switch" onclick="toggleChodnik()" id="sw-chodnik">
+               <span id="ch-label" style="color:var(--muted)">VOZOVKA</span>
+               <div class="switch-bg"><div class="switch-dot"></div></div>
+             </div>
+          </div>
+
+          <div id="sterk-toggle" style="display:none; grid-column: 1 / -1; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
+            <span style="font-size: 11px;">Mimo výkop dle hloubky?</span>
+            <div class="sub-switch" onclick="toggleSterkMimo()" id="sw-sterk">
+              <div class="switch-bg"><div class="switch-dot"></div></div>
             </div>
           </div>
         </div>
 
-        <div class="input-field"><div class="input-label">Délka (D)</div><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()"><span class="unit-tag">M</span></div></div>
-        <div class="input-field"><div class="input-label">Šířka (Š)</div><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.1" oninput="calc()"><span class="unit-tag">M</span></div></div>
-        <div class="input-field" id="h-wrap" style="display:none"><div class="input-label">Hloubka (H)</div><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.5" oninput="calc()"><span class="unit-tag">M</span></div></div>
-        <div id="txt-formula" style="font-family:'DM Mono'; font-size:11px; color:var(--muted); opacity:0.8;">Vzorec...</div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()"><span class="unit-tag">DÉLKA (m)</span></div></div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.1" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
+        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.1" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
+        <div id="txt-formula" style="font-family:'DM Mono'; font-size:10px; color:var(--muted); text-align: center; margin-top: 5px; opacity: 0.7;">Vzorec: (D×Š) + (D×0,5)</div>
       </div>
 
       <div class="card">
         <span class="section-title">Výpočet ploch</span>
-        <div class="res-box"><div class="res-label">Nad výkopem</div><div class="res-value" id="res-nad">0,00 m²</div><div id="sub-nad" style="font-size:11px; font-family:'DM Mono'; color:var(--muted);">0 × 0</div></div>
-        <div class="res-box green" id="box-mimo"><div class="res-label">Přídavná plocha</div><div class="res-value" id="res-mimo">0,00 m²</div><div id="sub-mimo" style="font-size:11px; font-family:'DM Mono'; color:var(--muted);">0 × 0</div></div>
-        <div class="total-highlight"><div><div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8;">CELKEM</div></div><div class="total-val" id="res-total">0,00 m²</div></div>
+        <div class="res-box"><div class="res-label">Nad výkopem</div><div class="res-value" id="res-nad">0,00 m²</div><div id="sub-nad" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,00</div></div>
+        <div class="res-box green"><div class="res-label">Přídavná plocha</div><div class="res-value" id="res-mimo">0,00 m²</div><div id="sub-mimo" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,50</div></div>
+        <div class="total-highlight"><div><div style="font-family:'DM Mono'; font-size:11px; font-weight:800; opacity:0.8;">CELKEM</div></div><div class="total-val" id="res-total">0,00 m²</div></div>
         <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat výsledek</button>
       </div>
     </div>
@@ -229,33 +223,23 @@
   <div id="tab-sum" class="page">
     <div class="card">
       <span class="section-title">Hromadné sečtení ploch</span>
-      <textarea class="summary-textarea" id="sum-input" placeholder="Vložte zkopírovaná data z kalkulačky...&#10;Např:&#10;asfalt&#10;1,17/0,90&#10;zeleň&#10;10,86/35,09" oninput="processSummary()"></textarea>
-      
+      <textarea class="summary-textarea" id="sum-input" placeholder="Sem vložte data z kalkulačky..." oninput="processSummary()"></textarea>
       <table class="sum-table">
         <thead>
-          <tr>
-            <th>POVRCH</th>
-            <th>NAD (m²)</th>
-            <th>MIMO (m²)</th>
-            <th style="text-align:right">CELKEM (m²)</th>
-          </tr>
+          <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
         </thead>
         <tbody id="sum-body">
-          <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--muted)">Zatím žádná data k zobrazení</td></tr>
+          <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <footer>
-    © 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; verze 1.5
-  </footer>
+  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.6</footer>
 </div>
 
 <script>
-  let currentTyp = 'ostatni';
-  let currentSurface = 'asfalt';
-  let sterkMimo = true;
+  let currentTyp = 'ostatni', currentSurface = 'asfalt', sterkMimo = true, isChodnik = false;
   let valNad = 0, valMimo = 0;
 
   function openTab(tabId, btn) {
@@ -267,7 +251,24 @@
 
   function toggleTheme() {
     document.body.classList.toggle('light-mode');
+    document.getElementById('theme-bg').classList.toggle('active-switch');
     document.getElementById('theme-label').textContent = document.body.classList.contains('light-mode') ? 'DARK MODE' : 'LIGHT MODE';
+  }
+
+  function toggleChodnik() {
+    isChodnik = !isChodnik;
+    const sw = document.getElementById('sw-chodnik');
+    const lbl = document.getElementById('ch-label');
+    sw.classList.toggle('active-switch', isChodnik);
+    lbl.textContent = isChodnik ? "CHODNÍK" : "VOZOVKA";
+    lbl.style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
+    calc();
+  }
+
+  function toggleSterkMimo() {
+    sterkMimo = !sterkMimo;
+    document.getElementById('sw-sterk').classList.toggle('active-switch', sterkMimo);
+    updateVisibility(); calc();
   }
 
   function setTyp(t) {
@@ -287,14 +288,11 @@
     const showH = (currentTyp === 'zelen') || (currentTyp === 'ostatni' && currentSurface === 'štěrk' && sterkMimo);
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
+    
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' ? 'flex' : 'none');
-  }
-
-  function toggleSterkMimo() {
-    sterkMimo = !sterkMimo;
-    document.getElementById('st-dot').style.right = sterkMimo ? '2px' : '18px';
-    document.getElementById('st-bg').style.background = sterkMimo ? 'var(--suas-green)' : 'var(--border)';
-    updateVisibility(); calc();
+    
+    const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba', 'mozaika'].includes(currentSurface);
+    document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
 
   function calc() {
@@ -303,13 +301,22 @@
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
     valNad = d * s;
     let subMimoTxt = "";
+    
     if (currentTyp === 'ostatni') {
-      if (currentSurface === 'štěrk' && sterkMimo) { valMimo = d * (s + h + 0.6); subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`; }
-      else if (currentSurface === 'štěrk' && !sterkMimo) { valMimo = 0; subMimoTxt = "0,00"; }
-      else { valMimo = d * 0.5; subMimoTxt = `${d.toFixed(2)} × 0,50`; }
+      if (currentSurface === 'štěrk' && sterkMimo) {
+        valMimo = d * (s + h + 0.6);
+        subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
+      } else if (currentSurface === 'štěrk' && !sterkMimo) {
+        valMimo = 0; subMimoTxt = "0,00";
+      } else {
+        valMimo = d * 0.5;
+        subMimoTxt = `${d.toFixed(2)} × 0,50`;
+      }
     } else {
-      valMimo = d * (s + h + 0.6); subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
+      valMimo = d * (s + h + 0.6);
+      subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
     }
+
     const f = (n) => n.toFixed(2).replace('.', ',');
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
@@ -322,7 +329,9 @@
   function copyToClipboard() {
     const n = valNad.toFixed(2).replace('.', ',');
     const m = valMimo.toFixed(2).replace('.', ',');
-    const label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
+    let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
+    if (currentTyp === 'ostatni' && isChodnik && !['štěrk', 'zeleň'].includes(label)) label += ' (CH)';
+    
     navigator.clipboard.writeText(`${label}\n${n}/${m}`).then(() => {
       const b = document.querySelector('.copy-btn');
       b.textContent = "✅ ZKOPÍROVÁNO";
@@ -334,69 +343,53 @@
     const input = document.getElementById('sum-input').value;
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
     const totals = {};
-    let currentSurface = "neznámé";
+    let currentS = "neznámé";
 
     for (let i = 0; i < lines.length; i++) {
-      // Pokud řádek obsahuje lomítko, je to záznam s plochou
       if (lines[i].includes('/')) {
         const val = lines[i].split('/');
         const n = parseFloat(val[0].replace(',', '.')) || 0;
         const m = parseFloat(val[1].replace(',', '.')) || 0;
-        
-        if (!totals[currentSurface]) {
-          totals[currentSurface] = { n: 0, m: 0, count: 0 };
-        }
-        totals[currentSurface].n += n;
-        totals[currentSurface].m += m;
-        totals[currentSurface].count += 1; // Přičteme záznam
+        if (!totals[currentS]) totals[currentS] = { n: 0, m: 0, c: 0 };
+        totals[currentS].n += n; totals[currentS].m += m; totals[currentS].c++;
       } else {
-        // Pokud řádek neobsahuje lomítko, považujeme ho za název povrchu
-        currentSurface = lines[i].toLowerCase();
+        currentS = lines[i].toLowerCase();
       }
     }
 
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
-    let gN = 0, gM = 0, gCount = 0;
-    const sorted = Object.keys(totals).sort();
-
-    if (sorted.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:var(--muted)">Vložte data</td></tr>';
+    let gN = 0, gM = 0, gC = 0;
+    const sortedKeys = Object.keys(totals).sort();
+    
+    if (sortedKeys.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
       return;
     }
 
-    // Upravená hlavička tabulky (v HTML části přidej jeden <th> pro počet)
-    document.querySelector('.sum-table thead tr').innerHTML = `
-      <th>POVRCH</th>
-      <th>POČET</th>
-      <th>NAD (m²)</th>
-      <th>MIMO (m²)</th>
-      <th style="text-align:right">CELKEM (m²)</th>
-    `;
-
-    sorted.forEach(k => {
-      const d = totals[k];
-      gN += d.n; gM += d.m; gCount += d.count;
-      body.innerHTML += `
-        <tr>
-          <td>${k}</td>
-          <td style="color:var(--muted)">${d.count}x</td>
-          <td>${d.n.toFixed(2).replace('.',',')}</td>
-          <td>${d.m.toFixed(2).replace('.',',')}</td>
-          <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
-        </tr>`;
-    });
-
-    body.innerHTML += `
-      <tr class="row-grand-total">
-        <td>CELKEM</td>
-        <td style="font-size:12px; opacity:0.7">${gCount}x</td>
-        <td>${gN.toFixed(2).replace('.',',')}</td>
-        <td>${gM.toFixed(2).replace('.',',')}</td>
-        <td style="text-align:right">${(gN+gM).toFixed(2).replace('.',',')} m²</td>
+    sortedKeys.forEach(k => {
+      const d = totals[k]; gN += d.n; gM += d.m; gC += d.c;
+      body.innerHTML += `<tr>
+        <td style="text-transform: capitalize;">${k}</td>
+        <td style="color:var(--muted)">${d.c}x</td>
+        <td>${d.n.toFixed(2).replace('.',',')}</td>
+        <td>${d.m.toFixed(2).replace('.',',')}</td>
+        <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
       </tr>`;
+    });
+    
+    body.innerHTML += `<tr class="row-grand-total">
+      <td><strong>CELKEM</strong></td>
+      <td>${gC}x</td>
+      <td>${gN.toFixed(2).replace('.',',')}</td>
+      <td>${gM.toFixed(2).replace('.',',')}</td>
+      <td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td>
+    </tr>`;
   }
 
+  // Init
+  document.getElementById('sw-sterk').classList.add('active-switch');
+  updateVisibility();
   calc();
 </script>
 </body>
