@@ -334,26 +334,67 @@
     const input = document.getElementById('sum-input').value;
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
     const totals = {};
+    let currentSurface = "neznámé";
+
     for (let i = 0; i < lines.length; i++) {
+      // Pokud řádek obsahuje lomítko, je to záznam s plochou
       if (lines[i].includes('/')) {
-        const key = lines[i-1] || "neznámé";
         const val = lines[i].split('/');
         const n = parseFloat(val[0].replace(',', '.')) || 0;
         const m = parseFloat(val[1].replace(',', '.')) || 0;
-        if (!totals[key]) totals[key] = { n: 0, m: 0 };
-        totals[key].n += n; totals[key].m += m;
+        
+        if (!totals[currentSurface]) {
+          totals[currentSurface] = { n: 0, m: 0, count: 0 };
+        }
+        totals[currentSurface].n += n;
+        totals[currentSurface].m += m;
+        totals[currentSurface].count += 1; // Přičteme záznam
+      } else {
+        // Pokud řádek neobsahuje lomítko, považujeme ho za název povrchu
+        currentSurface = lines[i].toLowerCase();
       }
     }
+
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
-    let gN = 0, gM = 0;
+    let gN = 0, gM = 0, gCount = 0;
     const sorted = Object.keys(totals).sort();
-    if (sorted.length === 0) { body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:50px; color:var(--muted)">Vložte data</td></tr>'; return; }
+
+    if (sorted.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:var(--muted)">Vložte data</td></tr>';
+      return;
+    }
+
+    // Upravená hlavička tabulky (v HTML části přidej jeden <th> pro počet)
+    document.querySelector('.sum-table thead tr').innerHTML = `
+      <th>POVRCH</th>
+      <th>POČET</th>
+      <th>NAD (m²)</th>
+      <th>MIMO (m²)</th>
+      <th style="text-align:right">CELKEM (m²)</th>
+    `;
+
     sorted.forEach(k => {
-      const d = totals[k]; gN += d.n; gM += d.m;
-      body.innerHTML += `<tr><td>${k}</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+      const d = totals[k];
+      gN += d.n; gM += d.m; gCount += d.count;
+      body.innerHTML += `
+        <tr>
+          <td>${k}</td>
+          <td style="color:var(--muted)">${d.count}x</td>
+          <td>${d.n.toFixed(2).replace('.',',')}</td>
+          <td>${d.m.toFixed(2).replace('.',',')}</td>
+          <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
+        </tr>`;
     });
-    body.innerHTML += `<tr class="row-grand-total"><td>CELKEM</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right">${(gN+gM).toFixed(2).replace('.',',')} m²</td></tr>`;
+
+    body.innerHTML += `
+      <tr class="row-grand-total">
+        <td>CELKEM</td>
+        <td style="font-size:12px; opacity:0.7">${gCount}x</td>
+        <td>${gN.toFixed(2).replace('.',',')}</td>
+        <td>${gM.toFixed(2).replace('.',',')}</td>
+        <td style="text-align:right">${(gN+gM).toFixed(2).replace('.',',')} m²</td>
+      </tr>`;
   }
 
   calc();
