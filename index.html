@@ -22,8 +22,6 @@
       --border: #e2e8f0;
       --accent: var(--suas-green);
       --input-bg: #f1f5f9;
-      --tog-bg-hover: rgba(55, 179, 74, 0.05);
-      --tog-bg-active: rgba(55, 179, 74, 0.1);
     }
 
     body.dark-mode {
@@ -33,9 +31,7 @@
       --muted: #94a3b8;
       --border: #334155;
       --accent: #4ade80;
-      --input-bg: #1e293b;
-      --tog-bg-hover: rgba(74, 222, 128, 0.05);
-      --tog-bg-active: rgba(74, 222, 128, 0.1);
+      --input-bg: #0f172a;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,16 +40,16 @@
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden; /* Fixace na jednu stránku */
       transition: background 0.3s;
+      padding: 20px;
     }
 
     .app-container {
-      width: 95%;
+      width: 100%;
       max-width: 1100px;
       display: flex;
       flex-direction: column;
@@ -61,33 +57,43 @@
     }
 
     header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 20px;
-      align-items: start;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding-bottom: 20px;
       border-bottom: 2px solid var(--border);
     }
 
-    .logo-area { display: flex; flex-direction: column; gap: 8px; }
-    
-    /* OPRAVA LOGA: full visibility */
-    .suas-logo { 
-      height: 60px; /* Větší a plně viditelné */
-      width: auto; 
-      display: block;
-      margin-left: -5px; /* Kompenzace vnitřního odsazení SVG */
+    .logo-area {
+      display: flex;
+      align-items: center;
     }
 
-    /* Přepínač Dark Mode */
-    .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    /* OPRAVA LOGA */
+    .suas-logo { 
+      height: 70px; 
+      width: auto; 
+      display: block;
+      color: var(--suas-blue);
+    }
+    body.dark-mode .suas-logo { color: white; }
+
+    .header-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
     .theme-switch {
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: 'DM Mono', monospace;
     }
     .switch-bg {
       width: 40px;
@@ -117,9 +123,9 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
     }
@@ -130,10 +136,9 @@
       color: var(--muted);
       text-transform: uppercase;
       margin-bottom: 20px;
-      display: block;
+      letter-spacing: 0.05em;
     }
 
-    /* Toggles */
     .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
     .tog-btn {
       padding: 15px;
@@ -145,64 +150,62 @@
       transition: 0.2s;
       color: var(--text);
     }
-    .tog-btn.active { border-color: var(--suas-green); background: var(--tog-bg-active); }
-    .tog-btn:hover:not(.active) { border-color: var(--muted); background: var(--tog-bg-hover); }
-    .tog-btn strong { display: block; font-size: 15px; margin-bottom: 4px; }
-    .tog-btn span { font-size: 11px; font-family: 'DM Mono'; opacity: 0.8; }
+    .tog-btn.active { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.1); }
+    .tog-btn strong { display: block; font-size: 15px; margin-bottom: 4px; font-family: 'Syne'; }
+    .tog-btn span { font-size: 11px; font-family: 'DM Mono'; opacity: 0.7; }
 
-    /* Inputs */
     .input-field { margin-bottom: 15px; }
-    .input-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .input-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
     .input-control {
       display: flex;
       background: var(--input-bg);
       border: 2px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
     }
     .input-control input {
-      flex: 1; border: none; background: transparent; padding: 12px; font-size: 18px; font-weight: 700; color: var(--text); outline: none;
+      flex: 1; border: none; background: transparent; padding: 14px; font-size: 20px; font-weight: 800; color: var(--text); outline: none; font-family: 'Inter';
     }
-    .unit-tag { background: var(--border); padding: 12px; font-size: 12px; font-weight: 800; color: var(--muted); }
+    .unit-tag { background: var(--border); padding: 14px; font-size: 12px; font-weight: 800; color: var(--muted); display: flex; align-items: center; }
 
-    /* Results */
     .res-box {
-      padding: 20px;
-      border-radius: 12px;
+      padding: 22px;
+      border-radius: 14px;
       margin-bottom: 15px;
-      background: rgba(0,0,0,0.03);
+      background: rgba(0,0,0,0.02);
       border-left: 6px solid var(--suas-light-blue);
     }
+    body.dark-mode .res-box { background: rgba(255,255,255,0.03); }
     .res-box.green { border-left-color: var(--suas-green); }
-    .res-label { font-family: 'DM Mono'; font-size: 11px; text-transform: uppercase; color: var(--muted); }
-    .res-value { font-family: 'Syne'; font-size: 28px; font-weight: 800; margin: 4px 0; }
+    .res-label { font-family: 'DM Mono'; font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .res-value { font-family: 'Syne'; font-size: 32px; font-weight: 800; }
 
     .total-highlight {
       margin-top: auto;
       background: linear-gradient(135deg, var(--suas-blue) 0%, var(--suas-light-blue) 100%);
       color: white;
-      padding: 25px;
-      border-radius: 14px;
+      padding: 30px;
+      border-radius: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .total-val { font-family: 'Syne'; font-size: 36px; font-weight: 800; color: var(--suas-yellow); }
+    .total-val { font-family: 'Syne'; font-size: 42px; font-weight: 800; color: var(--suas-yellow); }
 
     .formula-info {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       margin-top: 15px;
       color: var(--muted);
-      padding: 10px;
+      padding: 12px;
       background: rgba(0,0,0,0.03);
-      border-radius: 8px;
+      border-radius: 10px;
     }
 
     @media (max-width: 850px) {
-      body { overflow: auto; height: auto; padding: 20px; }
-      header { grid-template-columns: 1fr; }
-      .header-controls { align-items: flex-start; }
+      body { height: auto; padding: 20px 10px; }
+      header { flex-direction: column; gap: 20px; align-items: flex-start; }
+      .header-right { align-items: flex-start; text-align: left; }
       .main-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -212,16 +215,22 @@
 <div class="app-container">
   <header>
     <div class="logo-area">
-      <svg class="suas-logo" viewBox="0 0 351 166" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <svg class="suas-logo" viewBox="0 0 351 166" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M68 0C55 0 41 6 31 16C12 35 0 61 0 88L34 54C40 48 52 43 68 43L68 0Z" fill="#C5D91B"/>
         <path d="M68 129C84 129 96 124 102 118L136 84C136 111 124 137 105 156C95 166 81 172 68 172L68 129Z" fill="#37B34A"/>
         <path d="M0 88C0 115 12 141 31 160L136 55C136 28 124 2 105 -17L0 88Z" fill="#00A99D"/>
         <path d="M136 82L31 166H68C81 166 95 160 105 150C124 131 136 105 136 78L136 82Z" fill="#0076C0"/>
+        <g fill="currentColor">
+          <path d="M171.9 46.8c0 4.7-1.3 8.6-3.8 11.5-2.6 3-6.4 4.5-11.4 4.5-3.1 0-5.6-.6-7.5-1.7-1.9-1.2-3.3-2.6-4.1-4.4l4.7-3.7c1.7 2.7 4 4 6.9 4 2.6 0 4.6-.7 5.9-2s2-3.2 2-5.5c0-1.7-.4-3.1-1.2-4-.8-1-2.2-2-4.1-3.1-2.3-1.3-4.2-2.6-5.8-4-1.5-1.4-2.7-3-3.4-4.8s-1.1-3.8-1.1-6c0-4.3 1.3-7.9 3.8-10.7 2.5-2.8 6.1-4.2 10.7-4.2 2.6 0 4.9.5 6.8 1.4s3.3 2.3 4.1 4.1l-4.5 3.6c-1.4-2-3.3-3.1-5.7-3.1-2.2 0-3.9.6-5.1 1.8s-1.8 2.8-1.8 4.9c0 1.7.4 3.1 1.3 4.2.8 1 2.3 2.1 4.4 3.3 2.2 1.2 4.1 2.4 5.6 3.6 1.5 1.3 2.7 2.8 3.4 4.6.4 1.8.8 4.1.8 6.7z"/>
+          <path d="M211.7 18.8v25.2c0 5.6-1.5 10-4.4 13.2-2.9 3.2-7 4.8-12.2 4.8-5.2 0-9.2-1.6-12.2-4.8-3-3.2-4.5-7.6-4.5-13.2V18.8h6.4v25.6c0 3.6.9 6.4 2.6 8.2s4.3 2.8 7.7 2.8c3.4 0 5.9-.9 7.6-2.8s2.6-4.6 2.6-8.2V18.8h6.4zM246.6 51.8h-18l-3.3 9.5h-6.7L235.1 18h6.9l16.5 43.3h-6.7l-5.2-9.5zm-16.3-5.8h14.6l-7.3-21.3-7.3 21.3z"/>
+          <path d="M294.6 46.8c0 4.7-1.3 8.6-3.8 11.5-2.6 3-6.4 4.5-11.4 4.5-3.1 0-5.6-.6-7.5-1.7s-3.3-2.6-4.1-4.4l4.7-3.7c1.7 2.7 4 4 6.9 4 2.6 0 4.6-.7 5.9-2s2-3.2 2-5.5c0-1.7-.4-3.1-1.2-4-.8-1-2.2-2-4.1-3.1-2.3-1.3-4.2-2.6-5.8-4-1.5-1.4-2.7-3-3.4-4.8s-1.1-3.8-1.1-6c0-4.3 1.3-7.9 3.8-10.7 2.5-2.8 6.1-4.2 10.7-4.2 2.6 0 4.9.5 6.8 1.4s3.3 2.3 4.1 4.1l-4.5 3.6c-1.4-2-3.3-3.1-5.7-3.1-2.2 0-3.9.6-5.1 1.8s-1.8 2.8-1.8 4.9c0 1.7.4 3.1 1.3 4.2s2.3 2.1 4.4 3.3c2.2 1.2 4.1 2.4 5.6 3.6 1.5 1.3 2.7 2.8 3.4 4.6.4 1.8.8 4.1.8 6.7z"/>
+          <path d="M200.3 113.8c0 5.7-1.5 10.2-4.6 13.5-3.1 3.3-7.4 5-12.9 5-3.1 0-5.9-.5-8.3-1.5v-6.3c2.5 1.1 5.1 1.7 7.8 1.7 3.4 0 6.1-1 8-3.1s2.8-5 2.8-8.9V99.5h-9.3v-5.7h16.5v20zM216.5 93.8h11.9c3.2 0 5.6.8 7.2 2.3s2.4 3.7 2.4 6.4c0 2.1-.6 3.9-1.8 5.3s-2.9 2.4-5 2.9l7.7 11.3h-7l-7-10.6h-3.9v10.6h-6.4V93.8zm11.6 11.9c1.6 0 2.8-.4 3.6-1.1s1.2-1.9 1.2-3.3c0-1.5-.4-2.6-1.2-3.3s-2-1-3.6-1h-5.5v8.7h5.5zM247.9 93.8h6.4v31.9h-6.4V93.8zM265.8 93.8h10.9c5 0 8.8 1.4 11.5 4.2 2.7 2.8 4.1 6.7 4.1 11.7s-1.4 9-4.1 11.8c-2.7 2.8-6.6 4.2-11.5 4.2h-10.9V93.8zm10.7 26c3.1 0 5.4-.9 7.1-2.6s2.5-4.3 2.5-7.7c0-3.3-.8-5.9-2.5-7.6s-4-2.6-7.1-2.6h-4.3v20.5h4.3z"/>
+        </g>
       </svg>
     </div>
     
-    <div class="header-controls">
-      <h1 style="font-family:'Syne'; font-weight:800; font-size:20px; text-transform:uppercase;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
+    <div class="header-right">
+      <h1 style="font-family:'Syne'; font-weight:800; font-size:22px; text-transform:uppercase; letter-spacing:-0.02em;">Kalkulačka <span style="color:var(--suas-green)">zádlažby</span></h1>
       <div class="theme-switch" onclick="toggleTheme()">
         <span>DARK MODE</span>
         <div class="switch-bg"><div class="switch-dot"></div></div>
@@ -231,7 +240,7 @@
 
   <div class="main-grid">
     <div class="card">
-      <span class="section-title">Nastavení parametrů</span>
+      <span class="section-title">Konfigurace výkopu</span>
       
       <div class="toggle-group">
         <button class="tog-btn active" id="btn-ostatni" onclick="setTyp('ostatni')">
@@ -245,7 +254,7 @@
       </div>
 
       <div class="input-field">
-        <div class="input-label">Délka výkopu</div>
+        <div class="input-label">Délka výkopu (D)</div>
         <div class="input-control">
           <input type="number" id="inp-delka" value="10" step="0.5" oninput="calc()">
           <span class="unit-tag">M</span>
@@ -253,7 +262,7 @@
       </div>
 
       <div class="input-field">
-        <div class="input-label">Šířka výkopu</div>
+        <div class="input-label">Šířka výkopu (Š)</div>
         <div class="input-control">
           <input type="number" id="inp-sirka" value="0.65" step="0.01" oninput="calc()">
           <span class="unit-tag">M</span>
@@ -261,7 +270,7 @@
       </div>
 
       <div class="input-field" id="h-wrap" style="display:none">
-        <div class="input-label">Hloubka výkopu</div>
+        <div class="input-label">Hloubka výkopu (H)</div>
         <div class="input-control">
           <input type="number" id="inp-hloubka" value="0.80" step="0.01" oninput="calc()">
           <span class="unit-tag">M</span>
@@ -272,24 +281,24 @@
     </div>
 
     <div class="card">
-      <span class="section-title">Detailní výpočet</span>
+      <span class="section-title">Souhrn výměr</span>
       
       <div class="res-box">
-        <div class="res-label">Plocha nad výkopem</div>
+        <div class="res-label">Plocha přímo nad výkopem</div>
         <div class="res-value" id="res-nad">6,50 m²</div>
-        <div style="font-size:11px; color:var(--muted)" id="sub-nad">10,00 × 0,65</div>
+        <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted); margin-top:4px;" id="sub-nad">10,00 × 0,65</div>
       </div>
 
       <div class="res-box green">
         <div class="res-label">Přídavná plocha (mimo výkop)</div>
         <div class="res-value" id="res-mimo">5,00 m²</div>
-        <div style="font-size:11px; color:var(--muted)" id="sub-mimo">10,00 × 0,50</div>
+        <div style="font-size:11px; font-family:'DM Mono'; color:var(--muted); margin-top:4px;" id="sub-mimo">10,00 × 0,50</div>
       </div>
 
       <div class="total-highlight">
         <div>
-          <div style="font-family:'DM Mono'; font-size:12px; opacity:0.8">CELKOVÁ ZÁDLAŽBA</div>
-          <div style="font-size:14px; font-weight:600">Suma ploch</div>
+          <div style="font-family:'DM Mono'; font-size:12px; font-weight:800; opacity:0.8; letter-spacing:0.05em;">CELKOVÁ PLOCHA</div>
+          <div style="font-size:14px; font-weight:600">Zádlažba k realizaci</div>
         </div>
         <div class="total-val" id="res-total">11,50 m²</div>
       </div>
@@ -327,15 +336,15 @@
     } else {
       const koef = (s + h + 0.6);
       mimo = d * koef;
-      subMimo = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,6)`;
+      subMimo = `${d.toFixed(2)} × (${s.toFixed(2)} + ${h.toFixed(2)} + 0,60)`;
       formula = `Vzorec: (D × Š) + (D × (Š + H + 0,6))`;
     }
 
-    // Formátování s českou čárkou
-    function f(n) { return n.toFixed(2).replace('.', ','); }
+    // Formátování pro český standard
+    const f = (n) => n.toFixed(2).replace('.', ',');
 
     document.getElementById('res-nad').textContent = f(nad) + ' m²';
-    document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
+    document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`.replace(/,/g, ' , ').replace(/\s,\s/g, ' × ');
     
     document.getElementById('res-mimo').textContent = f(mimo) + ' m²';
     document.getElementById('sub-mimo').textContent = subMimo.replace(/\./g, ',');
@@ -344,7 +353,7 @@
     document.getElementById('txt-formula').textContent = formula;
   }
 
-  // První výpočet po načtení
+  // Inicializace
   calc();
 </script>
 
