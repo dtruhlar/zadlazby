@@ -135,16 +135,20 @@
     }
     .total-val { font-family: 'Syne'; font-size: 32px; font-weight: 800; color: var(--suas-yellow); }
 
-    .copy-btn {
-      width: 100%; margin-top: 15px; padding: 15px; background: var(--suas-green); color: white;
-      border: none; border-radius: 12px; font-family: 'Syne'; font-weight: 800; cursor: pointer; text-transform: uppercase;
+    .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .copy-btn, .add-btn, .clear-btn {
+      padding: 15px; border: none; border-radius: 12px; font-family: 'Syne'; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 12px;
     }
+    .copy-btn { background: var(--suas-light-blue); color: white; }
+    .add-btn { background: var(--suas-green); color: white; }
+    .clear-btn { background: #ef4444; color: white; margin-top: 10px; width: fit-content; align-self: flex-end; padding: 8px 15px; font-size: 10px; }
 
+    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .summary-textarea {
       width: 100%; min-height: 220px; background: var(--input-bg); border: 2px solid var(--border);
-      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical; margin-bottom: 15px;
+      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical;
     }
-    .sum-table { width: 100%; border-collapse: collapse; }
+    .sum-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .sum-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-family: 'DM Mono'; }
     .sum-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
     .row-grand-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); }
@@ -215,15 +219,22 @@
         <div class="res-box"><div class="res-label">Nad výkopem</div><div class="res-value" id="res-nad">0,00 m²</div><div id="sub-nad" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,00</div></div>
         <div class="res-box green"><div class="res-label">Přídavná plocha</div><div class="res-value" id="res-mimo">0,00 m²</div><div id="sub-mimo" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,50</div></div>
         <div class="total-highlight"><div><div style="font-family:'DM Mono'; font-size:11px; font-weight:800; opacity:0.8;">CELKEM</div></div><div class="total-val" id="res-total">0,00 m²</div></div>
-        <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat výsledek</button>
+        
+        <div class="action-group">
+            <button class="copy-btn" onclick="copyToClipboard()">📋 Kopírovat</button>
+            <button class="add-btn" onclick="addToSummary()">➕ Do sumáře</button>
+        </div>
       </div>
     </div>
   </div>
 
   <div id="tab-sum" class="page">
     <div class="card">
-      <span class="section-title">Hromadné sečtení ploch</span>
-      <textarea class="summary-textarea" id="sum-input" placeholder="Sem vložte data z kalkulačky..." oninput="processSummary()"></textarea>
+      <div class="summary-header">
+        <span class="section-title">Hromadné sečtení ploch</span>
+        <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat vše</button>
+      </div>
+      <textarea class="summary-textarea" id="sum-input" placeholder="Data se sem vloží automaticky nebo je vložte ručně..." oninput="processSummary()"></textarea>
       <table class="sum-table">
         <thead>
           <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
@@ -246,7 +257,7 @@
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
+    if(btn) btn.classList.add('active');
   }
 
   function toggleTheme() {
@@ -257,11 +268,9 @@
 
   function toggleChodnik() {
     isChodnik = !isChodnik;
-    const sw = document.getElementById('sw-chodnik');
-    const lbl = document.getElementById('ch-label');
-    sw.classList.toggle('active-switch', isChodnik);
-    lbl.textContent = isChodnik ? "CHODNÍK" : "VOZOVKA";
-    lbl.style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
+    document.getElementById('sw-chodnik').classList.toggle('active-switch', isChodnik);
+    document.getElementById('ch-label').textContent = isChodnik ? "CHODNÍK" : "VOZOVKA";
+    document.getElementById('ch-label').style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
     calc();
   }
 
@@ -288,9 +297,7 @@
     const showH = (currentTyp === 'zelen') || (currentTyp === 'ostatni' && currentSurface === 'štěrk' && sterkMimo);
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
-    
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' ? 'flex' : 'none');
-    
     const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba', 'mozaika'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
@@ -300,22 +307,12 @@
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
     valNad = d * s;
-    let subMimoTxt = "";
-    
+    let subMimoTxt = (currentTyp === 'ostatni' && !(currentSurface === 'štěrk' && sterkMimo)) ? `${d.toFixed(2)} × 0,50` : `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
     if (currentTyp === 'ostatni') {
-      if (currentSurface === 'štěrk' && sterkMimo) {
-        valMimo = d * (s + h + 0.6);
-        subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
-      } else if (currentSurface === 'štěrk' && !sterkMimo) {
-        valMimo = 0; subMimoTxt = "0,00";
-      } else {
-        valMimo = d * 0.5;
-        subMimoTxt = `${d.toFixed(2)} × 0,50`;
-      }
-    } else {
-      valMimo = d * (s + h + 0.6);
-      subMimoTxt = `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
-    }
+        if (currentSurface === 'štěrk' && sterkMimo) valMimo = d * (s + h + 0.6);
+        else if (currentSurface === 'štěrk' && !sterkMimo) { valMimo = 0; subMimoTxt = "0,00"; }
+        else valMimo = d * 0.5;
+    } else valMimo = d * (s + h + 0.6);
 
     const f = (n) => n.toFixed(2).replace('.', ',');
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
@@ -326,17 +323,37 @@
     document.getElementById('txt-formula').textContent = (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo)) ? "Vzorec: (D×Š) + (D×(Š+H+0,6))" : "Vzorec: (D×Š) + (D×0,5)";
   }
 
-  function copyToClipboard() {
+  function getFormattedResult() {
     const n = valNad.toFixed(2).replace('.', ',');
     const m = valMimo.toFixed(2).replace('.', ',');
     let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
     if (currentTyp === 'ostatni' && isChodnik && !['štěrk', 'zeleň'].includes(label)) label += ' (CH)';
-    
-    navigator.clipboard.writeText(`${label}\n${n}/${m}`).then(() => {
+    return `${label}\n${n}/${m}`;
+  }
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(getFormattedResult()).then(() => {
       const b = document.querySelector('.copy-btn');
-      b.textContent = "✅ ZKOPÍROVÁNO";
-      setTimeout(() => b.textContent = "📋 Kopírovat výsledek", 1500);
+      b.textContent = "✅ HOTOVO";
+      setTimeout(() => b.textContent = "📋 Kopírovat", 1000);
     });
+  }
+
+  function addToSummary() {
+    const sumArea = document.getElementById('sum-input');
+    const newEntry = getFormattedResult();
+    sumArea.value += (sumArea.value ? "\n\n" : "") + newEntry;
+    processSummary();
+    const b = document.querySelector('.add-btn');
+    b.textContent = "✅ PŘIDÁNO";
+    setTimeout(() => b.textContent = "➕ Do sumáře", 1000);
+  }
+
+  function clearSummary() {
+    if(confirm("Opravdu vymazat celý sumář?")) {
+        document.getElementById('sum-input').value = "";
+        processSummary();
+    }
   }
 
   function processSummary() {
@@ -344,7 +361,6 @@
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
     const totals = {};
     let currentS = "neznámé";
-
     for (let i = 0; i < lines.length; i++) {
       if (lines[i].includes('/')) {
         const val = lines[i].split('/');
@@ -352,45 +368,22 @@
         const m = parseFloat(val[1].replace(',', '.')) || 0;
         if (!totals[currentS]) totals[currentS] = { n: 0, m: 0, c: 0 };
         totals[currentS].n += n; totals[currentS].m += m; totals[currentS].c++;
-      } else {
-        currentS = lines[i].toLowerCase();
-      }
+      } else currentS = lines[i].toLowerCase();
     }
-
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
     let gN = 0, gM = 0, gC = 0;
-    const sortedKeys = Object.keys(totals).sort();
-    
-    if (sortedKeys.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
-      return;
-    }
-
-    sortedKeys.forEach(k => {
+    const sorted = Object.keys(totals).sort();
+    if (!sorted.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>'; return; }
+    sorted.forEach(k => {
       const d = totals[k]; gN += d.n; gM += d.m; gC += d.c;
-      body.innerHTML += `<tr>
-        <td style="text-transform: capitalize;">${k}</td>
-        <td style="color:var(--muted)">${d.c}x</td>
-        <td>${d.n.toFixed(2).replace('.',',')}</td>
-        <td>${d.m.toFixed(2).replace('.',',')}</td>
-        <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
-      </tr>`;
+      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td style="color:var(--muted)">${d.c}x</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
     });
-    
-    body.innerHTML += `<tr class="row-grand-total">
-      <td><strong>CELKEM</strong></td>
-      <td>${gC}x</td>
-      <td>${gN.toFixed(2).replace('.',',')}</td>
-      <td>${gM.toFixed(2).replace('.',',')}</td>
-      <td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td>
-    </tr>`;
+    body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
   }
 
-  // Init
   document.getElementById('sw-sterk').classList.add('active-switch');
-  updateVisibility();
-  calc();
+  updateVisibility(); calc();
 </script>
 </body>
 </html>
