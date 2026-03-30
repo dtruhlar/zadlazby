@@ -136,19 +136,21 @@
     .total-val { font-family: 'Syne'; font-size: 32px; font-weight: 800; color: var(--suas-yellow); }
 
     .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .copy-btn, .add-btn, .clear-btn {
+    .copy-btn, .add-btn, .clear-btn, .csv-btn {
       padding: 15px; border: none; border-radius: 12px; font-family: 'Syne'; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 12px;
     }
     .copy-btn { background: var(--suas-light-blue); color: white; }
     .add-btn { background: var(--suas-green); color: white; }
-    .clear-btn { background: #ef4444; color: white; margin-top: 10px; width: fit-content; align-self: flex-end; padding: 8px 15px; font-size: 10px; }
+    .clear-btn { background: #ef4444; color: white; padding: 8px 15px; font-size: 10px; }
+    .csv-btn { background: var(--border); color: var(--text); padding: 8px 15px; font-size: 10px; }
 
-    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
     .summary-textarea {
-      width: 100%; min-height: 220px; background: var(--input-bg); border: 2px solid var(--border);
+      width: 100%; min-height: 180px; background: var(--input-bg); border: 2px solid var(--border);
       border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical;
     }
-    .sum-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .sum-table-wrapper { overflow-x: auto; margin-top: 15px; }
+    .sum-table { width: 100%; border-collapse: collapse; min-width: 500px; }
     .sum-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-family: 'DM Mono'; }
     .sum-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
     .row-grand-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); }
@@ -160,8 +162,8 @@
 
 <div class="app-container">
   <div class="nav-tabs">
-    <div class="nav-tab active" onclick="openTab('tab-calc', this)">🏗️ KALKULAČKA</div>
-    <div class="nav-tab" onclick="openTab('tab-sum', this)">📊 SUMÁŘ PLOCH</div>
+    <div class="nav-tab active" id="tab-btn-calc" onclick="openTab('tab-calc', this)">🏗️ KALKULAČKA</div>
+    <div class="nav-tab" id="tab-btn-sum" onclick="openTab('tab-sum', this)">📊 SUMÁŘ PLOCH</div>
   </div>
 
   <header>
@@ -193,11 +195,11 @@
           <button class="surf-btn" onclick="setSurface('štěrk')">štěrk</button>
           
           <div id="chodnik-wrap" style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
-             <span style="font-size: 11px; font-weight: 700;">Konstrukce:</span>
-             <div class="sub-switch" onclick="toggleChodnik()" id="sw-chodnik">
-               <span id="ch-label" style="color:var(--muted)">VOZOVKA</span>
-               <div class="switch-bg"><div class="switch-dot"></div></div>
-             </div>
+              <span style="font-size: 11px; font-weight: 700;">Konstrukce:</span>
+              <div class="sub-switch" onclick="toggleChodnik()" id="sw-chodnik">
+                <span id="ch-label" style="color:var(--muted)">VOZOVKA</span>
+                <div class="switch-bg"><div class="switch-dot"></div></div>
+              </div>
           </div>
 
           <div id="sterk-toggle" style="display:none; grid-column: 1 / -1; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
@@ -208,9 +210,9 @@
           </div>
         </div>
 
-        <div class="input-field"><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()"><span class="unit-tag">DÉLKA (m)</span></div></div>
-        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.05" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
-        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.05" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" inputmode="decimal" oninput="calc()"><span class="unit-tag">DÉLKA (m)</span></div></div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.05" inputmode="decimal" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
+        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.05" inputmode="decimal" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
         <div id="txt-formula" style="font-family:'DM Mono'; font-size:10px; color:var(--muted); text-align: center; margin-top: 5px; opacity: 0.7;">Vzorec: (D×Š) + (D×0,5)</div>
       </div>
 
@@ -232,26 +234,43 @@
     <div class="card">
       <div class="summary-header">
         <span class="section-title">Hromadné sečtení ploch</span>
-        <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat vše</button>
+        <div style="display:flex; gap:8px;">
+            <button class="csv-btn" onclick="exportCSV()">📁 Excel (CSV)</button>
+            <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat</button>
+        </div>
       </div>
-      <textarea class="summary-textarea" id="sum-input" placeholder="Data se sem vloží automaticky nebo je vložte ručně..." oninput="processSummary()"></textarea>
-      <table class="sum-table">
-        <thead>
-          <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
-        </thead>
-        <tbody id="sum-body">
-          <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>
-        </tbody>
-      </table>
+      <textarea class="summary-textarea" id="sum-input" placeholder="Data se sem vloží automaticky..." oninput="processSummary()"></textarea>
+      <div class="sum-table-wrapper">
+          <table class="sum-table">
+            <thead>
+              <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
+            </thead>
+            <tbody id="sum-body">
+              <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>
+            </tbody>
+          </table>
+      </div>
     </div>
   </div>
 
-  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.6</footer>
+  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.7</footer>
 </div>
 
 <script>
   let currentTyp = 'ostatni', currentSurface = 'asfalt', sterkMimo = true, isChodnik = false;
   let valNad = 0, valMimo = 0;
+
+  // Formátování čísel pro český standard
+  const f = (n) => n.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Načtení dat při startu
+  window.onload = () => {
+    const saved = localStorage.getItem('suas_summary_data');
+    if(saved) {
+        document.getElementById('sum-input').value = saved;
+        processSummary();
+    }
+  };
 
   function openTab(tabId, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -306,26 +325,41 @@
     const d = parseFloat(document.getElementById('inp-delka').value) || 0;
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
+    
     valNad = d * s;
-    let subMimoTxt = (currentTyp === 'ostatni' && !(currentSurface === 'štěrk' && sterkMimo)) ? `${d.toFixed(2)} × 0,50` : `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
-    if (currentTyp === 'ostatni') {
-        if (currentSurface === 'štěrk' && sterkMimo) valMimo = d * (s + h + 0.6);
-        else if (currentSurface === 'štěrk' && !sterkMimo) { valMimo = 0; subMimoTxt = "0,00"; }
-        else valMimo = d * 0.5;
-    } else valMimo = d * (s + h + 0.6);
+    let subMimoTxt = "";
 
-    const f = (n) => n.toFixed(2).replace('.', ',');
+    if (currentTyp === 'zelen') {
+        valMimo = d * (s + h + 0.6);
+        subMimoTxt = `${f(d)} × (${f(s)}+${f(h)}+0,6)`;
+    } else {
+        if (currentSurface === 'štěrk') {
+            if (sterkMimo) {
+                valMimo = d * (s + h + 0.6);
+                subMimoTxt = `${f(d)} × (${f(s)}+${f(h)}+0,6)`;
+            } else {
+                valMimo = 0;
+                subMimoTxt = "0,00";
+            }
+        } else {
+            valMimo = d * 0.5;
+            subMimoTxt = `${f(d)} × 0,50`;
+        }
+    }
+
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
     document.getElementById('res-mimo').textContent = f(valMimo) + ' m²';
-    document.getElementById('sub-mimo').textContent = subMimoTxt.replace(/\./g, ',');
+    document.getElementById('sub-mimo').textContent = subMimoTxt;
     document.getElementById('res-total').textContent = f(valNad + valMimo) + ' m²';
-    document.getElementById('txt-formula').textContent = (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo)) ? "Vzorec: (D×Š) + (D×(Š+H+0,6))" : "Vzorec: (D×Š) + (D×0,5)";
+    
+    const isSpecial = (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo));
+    document.getElementById('txt-formula').textContent = isSpecial ? "Vzorec: (D×Š) + (D×(Š+H+0,6))" : "Vzorec: (D×Š) + (D×0,5)";
   }
 
   function getFormattedResult() {
-    const n = valNad.toFixed(2).replace('.', ',');
-    const m = valMimo.toFixed(2).replace('.', ',');
+    const n = f(valNad);
+    const m = f(valMimo);
     let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
     if (currentTyp === 'ostatni' && isChodnik && !['štěrk', 'zeleň'].includes(label)) label += ' (CH)';
     return `${label}\n${n}/${m}`;
@@ -334,8 +368,9 @@
   function copyToClipboard() {
     navigator.clipboard.writeText(getFormattedResult()).then(() => {
       const b = document.querySelector('.copy-btn');
+      const old = b.textContent;
       b.textContent = "✅ HOTOVO";
-      setTimeout(() => b.textContent = "📋 Kopírovat", 1000);
+      setTimeout(() => b.textContent = old, 1000);
     });
   }
 
@@ -344,9 +379,16 @@
     const newEntry = getFormattedResult();
     sumArea.value += (sumArea.value ? "\n\n" : "") + newEntry;
     processSummary();
+    
+    // Vizuální zpětná vazba
     const b = document.querySelector('.add-btn');
     b.textContent = "✅ PŘIDÁNO";
     setTimeout(() => b.textContent = "➕ Do sumáře", 1000);
+    
+    // Jemné bliknutí záložky sumáře
+    const sTab = document.getElementById('tab-btn-sum');
+    sTab.style.color = "var(--suas-green)";
+    setTimeout(() => sTab.style.color = "", 1000);
   }
 
   function clearSummary() {
@@ -358,32 +400,71 @@
 
   function processSummary() {
     const input = document.getElementById('sum-input').value;
+    localStorage.setItem('suas_summary_data', input); // Uložení
+
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
     const totals = {};
     let currentS = "neznámé";
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes('/')) {
-        const val = lines[i].split('/');
-        const n = parseFloat(val[0].replace(',', '.')) || 0;
-        const m = parseFloat(val[1].replace(',', '.')) || 0;
-        if (!totals[currentS]) totals[currentS] = { n: 0, m: 0, c: 0 };
-        totals[currentS].n += n; totals[currentS].m += m; totals[currentS].c++;
-      } else currentS = lines[i].toLowerCase();
-    }
+
+    lines.forEach(line => {
+        if (line.includes('/')) {
+            const val = line.split('/');
+            const n = parseFloat(val[0].replace(',', '.')) || 0;
+            const m = parseFloat(val[1].replace(',', '.')) || 0;
+            if (!totals[currentS]) totals[currentS] = { n: 0, m: 0, c: 0 };
+            totals[currentS].n += n; totals[currentS].m += m; totals[currentS].c++;
+        } else {
+            currentS = line.toLowerCase();
+        }
+    });
+
+    renderSummaryTable(totals);
+  }
+
+  function renderSummaryTable(totals) {
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
     let gN = 0, gM = 0, gC = 0;
     const sorted = Object.keys(totals).sort();
-    if (!sorted.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>'; return; }
+
+    if (!sorted.length) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
+        return;
+    }
+
     sorted.forEach(k => {
       const d = totals[k]; gN += d.n; gM += d.m; gC += d.c;
-      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td style="color:var(--muted)">${d.c}x</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td style="color:var(--muted)">${d.c}x</td><td>${f(d.n)}</td><td>${f(d.m)}</td><td style="text-align:right; color:var(--suas-light-blue)">${f(d.n+d.m)}</td></tr>`;
     });
-    body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
+
+    body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${f(gN)}</td><td>${f(gM)}</td><td style="text-align:right"><strong>${f(gN+gM)} m²</strong></td></tr>`;
   }
 
+  function exportCSV() {
+    const rows = [['Povrch', 'Pocet', 'Nad vykopem (m2)', 'Mimo vykop (m2)', 'Celkem (m2)']];
+    const tableRows = document.querySelectorAll("#sum-body tr");
+    
+    tableRows.forEach(tr => {
+        const cols = tr.querySelectorAll("td");
+        if (cols.length === 5) {
+            rows.push(Array.from(cols).map(c => c.innerText.replace('x', '').replace(' m²', '')));
+        }
+    });
+
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(";")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Sumar_ploch_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Inicializace
   document.getElementById('sw-sterk').classList.add('active-switch');
-  updateVisibility(); calc();
+  updateVisibility(); 
+  calc();
 </script>
 </body>
 </html>
