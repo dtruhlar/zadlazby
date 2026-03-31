@@ -256,7 +256,7 @@
 
         <div class="card">
           <div class="rps-container" id="rps-dynamic-calc" style="border-top: none; padding-top: 0;">
-            </div>
+          </div>
         </div>
       </div>
 
@@ -271,8 +271,17 @@
       </div>
       <textarea class="summary-textarea" id="sum-input" placeholder="Data se vloží automaticky..." oninput="processSummary()"></textarea>
       <table class="sum-table">
-        <thead><tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr></thead>
-        <tbody id="sum-body"><tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
+        <thead>
+          <tr>
+            <th>POVRCH</th>
+            <th>NAD (m²)</th>
+            <th>KÓD NAD</th>
+            <th>MIMO (m²)</th>
+            <th>KÓD MIMO</th>
+            <th style="text-align:right">CELKEM (m²)</th>
+          </tr>
+        </thead>
+        <tbody id="sum-body"><tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -328,8 +337,6 @@
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' && currentTyp === 'ostatni' ? 'flex' : 'none');
-    
-    // VYŘAZENÍ MOZAIKY Z MOŽNOSTI CHODNÍKU
     const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
@@ -406,10 +413,18 @@
   function addToSummary() {
     const n = (valNad).toFixed(2).replace('.', ',');
     const m = (valMimo).toFixed(2).replace('.', ',');
+    
+    // Získání aktuálních RPS kódů
+    let key = (currentTyp === 'zelen') ? 'zeleň' : currentSurface;
+    const config = RPS_MAP[key];
+    const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
+    
     let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
     if (isChodnik && currentTyp === 'ostatni' && !['štěrk','zeleň'].includes(label)) label += ' (CH)';
+    
     const sumArea = document.getElementById('sum-input');
-    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}\n${n}/${m}`;
+    // Přidáváme data včetně kódů ve formátu: Label|KódNad|KódMimo\nN/M
+    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}|${data.nad}|${data.mimo}\n${n}/${m}`;
     processSummary();
   }
 
@@ -417,27 +432,61 @@
 
   function processSummary() {
     const input = document.getElementById('sum-input').value;
-    const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
+    const segments = input.split('\n\n').filter(s => s.trim() !== "");
     const totals = {};
-    let curS = "neznámé";
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes('/')) {
-        const val = lines[i].split('/');
-        const n = parseFloat(val[0].replace(',', '.')) || 0;
-        const m = parseFloat(val[1].replace(',', '.')) || 0;
-        if (!totals[curS]) totals[curS] = { n: 0, m: 0, c: 0 };
-        totals[curS].n += n; totals[curS].m += m; totals[curS].c++;
-      } else curS = lines[i].toLowerCase();
-    }
+    
+    segments.forEach(seg => {
+      const lines = seg.split('\n');
+      if (lines.length >= 2) {
+        const header = lines[0].split('|'); // label | kodNad | kodMimo
+        const label = header[0];
+        const kn = header[1] || '-';
+        const km = header[2] || '-';
+        
+        const vals = lines[1].split('/');
+        const n = parseFloat(vals[0].replace(',', '.')) || 0;
+        const m = parseFloat(vals[1].replace(',', '.')) || 0;
+        
+        // Klíč pro seskupení (label + kódy)
+        const key = `${label}|${kn}|${km}`;
+        if (!totals[key]) totals[key] = { n: 0, m: 0, label: label, kn: kn, km: km };
+        totals[key].n += n;
+        totals[key].m += m;
+      }
+    });
+
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
-    let gN = 0, gM = 0, gC = 0;
-    Object.keys(totals).sort().forEach(k => {
-      const d = totals[k]; gN += d.n; gM += d.m; gC += d.c;
-      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td>${d.c}x</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+    let gN = 0, gM = 0;
+    
+    const keys = Object.keys(totals).sort();
+    keys.forEach(k => {
+      const d = totals[k];
+      gN += d.n; gM += d.m;
+      body.innerHTML += `
+        <tr>
+          <td style="text-transform: capitalize;">${d.label}</td>
+          <td>${d.n.toFixed(2).replace('.',',')}</td>
+          <td style="font-family:'DM Mono'; font-size:12px; color:var(--suas-green)">${d.kn}</td>
+          <td>${d.m.toFixed(2).replace('.',',')}</td>
+          <td style="font-family:'DM Mono'; font-size:12px; color:var(--suas-green)">${d.km}</td>
+          <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
+        </tr>`;
     });
-    if(gC > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
-    else body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
+
+    if(keys.length > 0) {
+      body.innerHTML += `
+        <tr class="row-grand-total">
+          <td><strong>CELKEM</strong></td>
+          <td><strong>${gN.toFixed(2).replace('.',',')}</strong></td>
+          <td></td>
+          <td><strong>${gM.toFixed(2).replace('.',',')}</strong></td>
+          <td></td>
+          <td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td>
+        </tr>`;
+    } else {
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
+    }
   }
 
   updateVisibility(); calc();
