@@ -42,7 +42,7 @@
       padding: 20px;
     }
 
-    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 15px; }
+    .app-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 15px; }
 
     .nav-tabs { display: flex; gap: 8px; }
     .nav-tab {
@@ -58,6 +58,8 @@
       opacity: 0.6;
     }
     .nav-tab.active { opacity: 1; border-bottom: 3px solid var(--suas-green); background: var(--card); }
+
+    #tab-btn-navod { display: none; }
 
     header {
       display: flex;
@@ -83,7 +85,7 @@
     .page { display: none; }
     .page.active { display: block; }
 
-    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: 20px; align-items: start; }
 
     .card {
       background: var(--card);
@@ -93,9 +95,21 @@
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
+      margin-bottom: 15px;
     }
 
     .section-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; }
+
+    .instructions-list { list-style: none; }
+    .instructions-list li { 
+      margin-bottom: 12px; 
+      font-size: 13px; 
+      line-height: 1.5; 
+      display: flex; 
+      gap: 10px; 
+      color: var(--text);
+    }
+    .instructions-list b { color: var(--suas-green); font-family: 'DM Mono'; }
 
     .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .tog-btn {
@@ -143,6 +157,22 @@
     .add-btn { background: var(--suas-green); color: white; }
     .clear-btn { background: #ef4444; color: white; margin-top: 10px; width: fit-content; align-self: flex-end; padding: 8px 15px; font-size: 10px; }
 
+    /* RPS Styles */
+    .rps-container { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .rps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .rps-category { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; }
+    .rps-cat-title { font-size: 9px; font-weight: 800; color: var(--suas-yellow); margin-bottom: 8px; font-family: 'DM Mono'; }
+    .rps-btn-row { display: flex; flex-direction: column; gap: 5px; }
+    .rps-copy-btn {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
+      padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; text-align: left;
+    }
+    .rps-copy-btn:hover { border-color: var(--suas-light-blue); }
+    .rps-copy-btn code { color: var(--suas-green); font-weight: 800; font-family: 'DM Mono'; font-size: 12px; }
+    .rps-copy-btn.copied { background: var(--suas-green); color: white; }
+    .rps-copy-btn.copied code { color: white; }
+
     .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .summary-textarea {
       width: 100%; min-height: 220px; background: var(--input-bg); border: 2px solid var(--border);
@@ -153,7 +183,19 @@
     .sum-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
     .row-grand-total { background: rgba(197, 217, 27, 0.1); color: var(--suas-yellow); }
 
-    @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } .surface-selector { grid-template-columns: repeat(2, 1fr); } }
+    footer { margin-top: 10px; font-size: 11px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 1000px) {
+      .main-grid { grid-template-columns: 1fr 1fr; }
+      .instruction-card { display: none; }
+      #tab-btn-navod { display: block; }
+    }
+
+    @media (max-width: 850px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .surface-selector { grid-template-columns: repeat(2, 1fr); }
+      .rps-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body class="dark-mode">
@@ -162,6 +204,7 @@
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="openTab('tab-calc', this)">🏗️ KALKULAČKA</div>
     <div class="nav-tab" onclick="openTab('tab-sum', this)">📊 SUMÁŘ PLOCH</div>
+    <div class="nav-tab" id="tab-btn-navod" onclick="openTab('tab-navod', this)">📖 NÁVOD</div>
   </div>
 
   <header>
@@ -225,6 +268,18 @@
             <button class="add-btn" onclick="addToSummary()">➕ Do sumáře</button>
         </div>
       </div>
+
+      <div class="card instruction-card" style="background: rgba(255,255,255,0.01);">
+        <span class="section-title">Pracovní postup</span>
+        <ul class="instructions-list">
+          <li><b>01</b> Vyber druh zádlažby a konstrukci.</li>
+          <li><b>02</b> Zadej rozměry a klikni na Kopírovat.</li>
+          <li><b>03</b> Použij RPS kódy níže pro rychlé kopírování názvů do systému.</li>
+        </ul>
+
+        <div class="rps-container" id="rps-module-calc">
+          </div>
+      </div>
     </div>
   </div>
 
@@ -235,6 +290,9 @@
         <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat vše</button>
       </div>
       <textarea class="summary-textarea" id="sum-input" placeholder="Data se sem vloží automaticky nebo je vložte ručně..." oninput="processSummary()"></textarea>
+      
+      <div class="rps-container" id="rps-module-sum" style="border-top:none; margin-bottom: 20px;"></div>
+
       <table class="sum-table">
         <thead>
           <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
@@ -246,10 +304,75 @@
     </div>
   </div>
 
-  <footer>© 2026 SUAS Grid s.r.o. - Jakub Šnajdr &nbsp; | &nbsp; v1.6</footer>
+  <div id="tab-navod" class="page">
+    <div class="card">
+        <span class="section-title">Pracovní postup</span>
+        <ul class="instructions-list">
+          <li><b>1.</b> Vyber druh zádlažby.</li>
+          <li><b>2.</b> Vyber, zda je v chodníku nebo ve vozovce.</li>
+          <li><b>3.</b> Zadej délku výkopu a případně uprav šířku.</li>
+          <li><b>4.</b> Klikni na kopírovat a pokud chceš, přidej do sumáře.</li>
+          <li><b>5.</b> RPS kódy zkopíruješ kliknutím na příslušný kód v dolní části panelu.</li>
+        </ul>
+    </div>
+  </div>
+
+  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.8</footer>
 </div>
 
 <script>
+  // DATA RPS KÓDŮ
+  const rpsData = [
+    { cat: "ZÁMKOVÁ DLAŽBA (CH)", nad: "MEB35", mimo: "MEB36" },
+    { cat: "ZÁMKOVÁ DLAŽBA (VOZ)", nad: "MEB69", mimo: "MEB70" },
+    { cat: "ASFALT (CH)", nad: "MEB31", mimo: "MEB32" },
+    { cat: "ASFALT (VOZ)", nad: "MEB67", mimo: "MEB68" },
+    { cat: "BETONOVÁ DLAŽBA (CH)", nad: "MEB45", mimo: "MEB46" },
+    { cat: "BETONOVÁ DLAŽBA (VOZ)", nad: "MEB79", mimo: "MEB80" },
+    { cat: "KAMENNÁ DLAŽBA (CH)", nad: "MEB41", mimo: "MEB42" },
+    { cat: "KAMENNÁ DLAŽBA (VOZ)", nad: "MEB75", mimo: "MEB76" },
+    { cat: "MOZAIKA (CH)", nad: "MEB53", mimo: "MEB54" },
+    { cat: "ŠTĚRK / ZELEŇ", nad: "MEB83", mimo: "RDB93", zelenNad: "RDB90", zelenMimo: "RDB91" }
+  ];
+
+  function renderRPS() {
+    const modules = ['rps-module-calc', 'rps-module-sum'];
+    modules.forEach(modId => {
+      const container = document.getElementById(modId);
+      if(!container) return;
+      
+      let html = `<span class="section-title">Kódy položek RPS (Kliknutím kopíruj)</span><div class="rps-grid">`;
+      
+      rpsData.forEach(item => {
+        html += `
+          <div class="rps-category">
+            <div class="rps-cat-title">${item.cat}</div>
+            <div class="rps-btn-row">
+              <button class="rps-copy-btn" onclick="copyRPS('${item.nad}', this)">Nad výkopem <code>${item.nad}</code></button>
+              <button class="rps-copy-btn" onclick="copyRPS('${item.mimo || item.zelenMimo}', this)">Mimo výkop <code>${item.mimo || item.zelenMimo}</code></button>
+              ${item.zelenNad ? `<button class="rps-copy-btn" onclick="copyRPS('${item.zelenNad}', this)">Zeleň Nad <code>${item.zelenNad}</code></button>` : ''}
+            </div>
+          </div>`;
+      });
+      
+      html += `</div>`;
+      container.innerHTML = html;
+    });
+  }
+
+  function copyRPS(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const oldText = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerText = "KOPÍROVÁNO!";
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = oldText;
+      }, 800);
+    });
+  }
+
+  // --- PŮVODNÍ LOGIKA KALKULAČKY ---
   let currentTyp = 'ostatni', currentSurface = 'asfalt', sterkMimo = true, isChodnik = false;
   let valNad = 0, valMimo = 0;
 
@@ -382,6 +505,8 @@
     body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
   }
 
+  // Inicializace
+  renderRPS();
   document.getElementById('sw-sterk').classList.add('active-switch');
   updateVisibility(); calc();
 </script>
