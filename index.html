@@ -59,8 +59,6 @@
     }
     .nav-tab.active { opacity: 1; border-bottom: 3px solid var(--suas-green); background: var(--card); }
 
-    #tab-btn-navod { display: none; }
-
     header {
       display: flex;
       justify-content: space-between;
@@ -149,21 +147,14 @@
     /* RPS Styles */
     .rps-container { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
     .rps-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .rps-grid-sum { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .rps-category { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px dashed var(--border); }
-    .rps-cat-title { font-size: 10px; font-weight: 800; color: var(--suas-yellow); margin-bottom: 10px; font-family: 'DM Mono'; text-transform: uppercase; }
-    .rps-btn-row { display: flex; flex-direction: column; gap: 8px; }
     .rps-copy-btn {
       display: flex; justify-content: space-between; align-items: center;
       background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
       padding: 10px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: left;
     }
-    .rps-copy-btn:hover { border-color: var(--suas-green); transform: translateY(-1px); }
+    .rps-copy-btn:hover { border-color: var(--suas-green); }
     .rps-copy-btn code { color: var(--suas-green); font-weight: 800; font-family: 'DM Mono'; font-size: 13px; margin-left: 10px; }
-    .rps-copy-btn.copied { background: var(--suas-green); color: white; border-color: var(--suas-green); }
-    .rps-copy-btn.copied code { color: white; }
 
-    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .summary-textarea {
       width: 100%; min-height: 200px; background: var(--input-bg); border: 2px solid var(--border);
       border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical; margin-bottom: 15px;
@@ -177,12 +168,9 @@
 
     @media (max-width: 1000px) {
       .main-grid { grid-template-columns: 1fr 1fr; }
-      .instruction-card { display: none; }
-      #tab-btn-navod { display: block; }
     }
     @media (max-width: 850px) {
       .main-grid { grid-template-columns: 1fr; }
-      .rps-grid-sum { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -229,11 +217,18 @@
                <div class="switch-bg"><div class="switch-dot"></div></div>
              </div>
           </div>
+
+          <div id="sterk-toggle" style="display:none; grid-column: 1 / -1; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
+            <span style="font-size: 11px; font-weight: 700;">Mimo výkop počítat jako zeleň?</span>
+            <div class="sub-switch" onclick="toggleSterkMimo()" id="sw-sterk">
+              <div class="switch-bg"><div class="switch-dot"></div></div>
+            </div>
+          </div>
         </div>
 
         <div class="input-field"><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()"><span class="unit-tag">DÉLKA (m)</span></div></div>
-        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.1" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
-        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.1" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.05" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
+        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.05" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
       </div>
 
       <div class="card">
@@ -248,7 +243,7 @@
         </div>
       </div>
 
-      <div class="card instruction-card">
+      <div class="card">
         <div class="rps-container" id="rps-dynamic-calc">
           </div>
       </div>
@@ -257,73 +252,43 @@
 
   <div id="tab-sum" class="page">
     <div class="card">
-      <div class="summary-header">
+      <div class="summary-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <span class="section-title">Hromadné sečtení ploch</span>
         <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat vše</button>
       </div>
       <textarea class="summary-textarea" id="sum-input" placeholder="Data se vloží automaticky..." oninput="processSummary()"></textarea>
-      
-      <div id="rps-full-sum" class="rps-grid-sum">
-          </div>
-
       <table class="sum-table">
-        <thead>
-          <tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr>
-        </thead>
-        <tbody id="sum-body">
-          <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>
-        </tbody>
+        <thead><tr><th>POVRCH</th><th>POČET</th><th>NAD (m²)</th><th>MIMO (m²)</th><th style="text-align:right">CELKEM (m²)</th></tr></thead>
+        <tbody id="sum-body"><tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
       </table>
     </div>
   </div>
 
-  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.9</footer>
+  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář</footer>
 </div>
 
 <script>
-  // DEFINICE KÓDŮ
   const RPS_MAP = {
-    'asfalt': {
-      'vozovka': { nad: 'MEB67', mimo: 'MEB68', label: 'Asfalt - Vozovka' },
-      'chodnik': { nad: 'MEB31', mimo: 'MEB32', label: 'Asfalt - Chodník' }
-    },
-    'zámková dlažba': {
-      'vozovka': { nad: 'MEB69', mimo: 'MEB70', label: 'Zámková dlažba - Vozovka' },
-      'chodnik': { nad: 'MEB35', mimo: 'MEB36', label: 'Zámková dlažba - Chodník' }
-    },
-    'beton. dlažba': {
-      'vozovka': { nad: 'MEB79', mimo: 'MEB80', label: 'Beton. dlažba - Vozovka' },
-      'chodnik': { nad: 'MEB45', mimo: 'MEB46', label: 'Beton. dlažba - Chodník' }
-    },
-    'kamenná dlažba': {
-      'vozovka': { nad: 'MEB75', mimo: 'MEB76', label: 'Kamenná dlažba - Vozovka' },
-      'chodnik': { nad: 'MEB41', mimo: 'MEB42', label: 'Kamenná dlažba - Chodník' }
-    },
-    'mozaika': {
-      'vozovka': { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Vozovka' },
-      'chodnik': { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Chodník' }
-    },
-    'štěrk': {
-      'default': { nad: 'MEB83', mimo: 'RDB93', label: 'Štěrk' }
-    },
-    'zeleň': {
-      'default': { nad: 'RDB90', mimo: 'RDB91', label: 'Zeleň' }
-    }
+    'asfalt': { vozovka: { nad: 'MEB67', mimo: 'MEB68', label: 'Asfalt - Vozovka' }, chodnik: { nad: 'MEB31', mimo: 'MEB32', label: 'Asfalt - Chodník' } },
+    'zámková dlažba': { vozovka: { nad: 'MEB69', mimo: 'MEB70', label: 'Zámková dlažba - Vozovka' }, chodnik: { nad: 'MEB35', mimo: 'MEB36', label: 'Zámková dlažba - Chodník' } },
+    'beton. dlažba': { vozovka: { nad: 'MEB79', mimo: 'MEB80', label: 'Beton. dlažba - Vozovka' }, chodnik: { nad: 'MEB45', mimo: 'MEB46', label: 'Beton. dlažba - Chodník' } },
+    'kamenná dlažba': { vozovka: { nad: 'MEB75', mimo: 'MEB76', label: 'Kamenná dlažba - Vozovka' }, chodnik: { nad: 'MEB41', mimo: 'MEB42', label: 'Kamenná dlažba - Chodník' } },
+    'mozaika': { vozovka: { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Vozovka' }, chodnik: { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Chodník' } },
+    'štěrk': { default: { nad: 'MEB83', mimo: 'RDB93', label: 'Štěrk' } },
+    'zeleň': { default: { nad: 'RDB90', mimo: 'RDB91', label: 'Zeleň' } }
   };
 
-  let currentTyp = 'ostatni', currentSurface = 'asfalt', isChodnik = false;
+  let currentTyp = 'ostatni', currentSurface = 'asfalt', isChodnik = false, sterkMimo = false;
   let valNad = 0, valMimo = 0;
 
   function updateRPSCalc() {
     const container = document.getElementById('rps-dynamic-calc');
-    let key = currentSurface;
-    if (currentTyp === 'zelen') key = 'zeleň';
-    
+    let key = (currentTyp === 'zelen') ? 'zeleň' : currentSurface;
     const config = RPS_MAP[key];
     const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
 
     container.innerHTML = `
-      <span class="section-title">RPS Kódy: ${data.label}</span>
+      <span class="section-title">Kódy pro: ${data.label}</span>
       <div class="rps-grid">
         <button class="rps-copy-btn" onclick="copyText('${data.nad}', this)">Nad výkopem <code>${data.nad}</code></button>
         <button class="rps-copy-btn" onclick="copyText('${data.mimo}', this)">Mimo výkop <code>${data.mimo}</code></button>
@@ -331,73 +296,25 @@
     `;
   }
 
-  function renderRPSFullSum() {
-    const container = document.getElementById('rps-full-sum');
-    let html = '';
-    for (const [surf, modes] of Object.entries(RPS_MAP)) {
-        const item = modes.default || modes.chodnik; // Pro sumář stačí základ
-        html += `
-          <div class="rps-category" style="margin-bottom:10px">
-            <div class="rps-cat-title">${surf}</div>
-            <div class="rps-btn-row">
-              <button class="rps-copy-btn" onclick="copyText('${item.nad}', this)">Nad <code>${item.nad}</code></button>
-              <button class="rps-copy-btn" onclick="copyText('${item.mimo}', this)">Mimo <code>${item.mimo}</code></button>
-            </div>
-          </div>`;
-    }
-    container.innerHTML = html;
-  }
-
   function copyText(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
-      const original = btn.innerHTML;
-      btn.classList.add('copied');
+      const orig = btn.innerHTML;
       btn.innerText = "Zkopírováno!";
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = original;
-      }, 800);
+      setTimeout(() => { btn.innerHTML = orig; }, 800);
     });
   }
 
-  function openTab(tabId, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
-    if(tabId === 'tab-sum') renderRPSFullSum();
-  }
-
-  function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    document.getElementById('theme-bg').classList.toggle('active-switch');
-    document.getElementById('theme-label').textContent = document.body.classList.contains('light-mode') ? 'DARK MODE' : 'LIGHT MODE';
-  }
-
-  function toggleChodnik() {
-    isChodnik = !isChodnik;
-    document.getElementById('sw-chodnik').classList.toggle('active-switch', isChodnik);
-    document.getElementById('ch-label').textContent = isChodnik ? "CHODNÍK" : "VOZOVKA";
-    document.getElementById('ch-label').style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
-    calc();
-  }
-
-  function setTyp(t) {
-    currentTyp = t;
-    document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
-    document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
-    updateVisibility(); calc();
-  }
-
-  function setSurface(s) {
-    currentSurface = s;
-    document.querySelectorAll('.surf-btn').forEach(b => b.classList.toggle('active', b.textContent === s));
+  function toggleSterkMimo() {
+    sterkMimo = !sterkMimo;
+    document.getElementById('sw-sterk').classList.toggle('active-switch', sterkMimo);
     updateVisibility(); calc();
   }
 
   function updateVisibility() {
-    document.getElementById('h-wrap').style.display = (currentTyp === 'zelen') ? 'block' : 'none';
+    const showH = (currentTyp === 'zelen') || (currentSurface === 'štěrk' && sterkMimo);
+    document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
+    document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' && currentTyp === 'ostatni' ? 'flex' : 'none');
     const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba', 'mozaika'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
@@ -406,61 +323,89 @@
     const d = parseFloat(document.getElementById('inp-delka').value) || 0;
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
-    valNad = d * s;
-    if (currentTyp === 'ostatni') valMimo = d * 0.5;
-    else valMimo = d * (s + h + 0.6);
-
     const f = (n) => n.toFixed(2).replace('.', ',');
+
+    valNad = d * s;
+    if (currentTyp === 'zelen') {
+      valMimo = d * (s + h + 0.6);
+      document.getElementById('sub-mimo').textContent = `${f(d)} × (${f(s)}+${f(h)}+0,6)`;
+    } else if (currentSurface === 'štěrk') {
+      valMimo = sterkMimo ? (d * (s + h + 0.6)) : 0;
+      document.getElementById('sub-mimo').textContent = sterkMimo ? `${f(d)} × (${f(s)}+${f(h)}+0,6)` : "Zablokováno (0,00)";
+    } else {
+      valMimo = d * 0.5;
+      document.getElementById('sub-mimo').textContent = `${f(d)} × 0,50`;
+    }
+
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
     document.getElementById('res-mimo').textContent = f(valMimo) + ' m²';
-    document.getElementById('sub-mimo').textContent = currentTyp === 'ostatni' ? `${f(d)} × 0,50` : `${f(d)} × (${f(s)}+${f(h)}+0,6)`;
     document.getElementById('res-total').textContent = f(valNad + valMimo) + ' m²';
     updateRPSCalc();
   }
 
-  function getFormattedResult() {
-    const n = valNad.toFixed(2).replace('.', ',');
-    const m = valMimo.toFixed(2).replace('.', ',');
-    let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
-    if (currentTyp === 'ostatni' && isChodnik && !['štěrk', 'zeleň'].includes(label)) label += ' (CH)';
-    return `${label}\n${n}/${m}`;
+  // Zbytek funkcí (Tabs, Theme, Summary) zůstává zachován z minula
+  function openTab(tabId, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active'); btn.classList.add('active');
   }
-
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    document.getElementById('theme-bg').classList.toggle('active-switch');
+    document.getElementById('theme-label').textContent = document.body.classList.contains('light-mode') ? 'DARK MODE' : 'LIGHT MODE';
+  }
+  function toggleChodnik() {
+    isChodnik = !isChodnik;
+    document.getElementById('sw-chodnik').classList.toggle('active-switch', isChodnik);
+    document.getElementById('ch-label').textContent = isChodnik ? "CHODNÍK" : "VOZOVKA";
+    document.getElementById('ch-label').style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
+    calc();
+  }
+  function setTyp(t) {
+    currentTyp = t;
+    document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
+    document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
+    updateVisibility(); calc();
+  }
+  function setSurface(s) {
+    currentSurface = s;
+    document.querySelectorAll('.surf-btn').forEach(b => b.classList.toggle('active', b.textContent === s));
+    updateVisibility(); calc();
+  }
   function copyToClipboard() {
-    navigator.clipboard.writeText(getFormattedResult()).then(() => {
-      const b = document.querySelector('.copy-btn');
-      b.textContent = "✅ HOTOVO";
+    const n = (valNad).toFixed(2).replace('.', ',');
+    const m = (valMimo).toFixed(2).replace('.', ',');
+    let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
+    if (isChodnik && currentTyp === 'ostatni' && !['štěrk','zeleň'].includes(label)) label += ' (CH)';
+    navigator.clipboard.writeText(`${label}\n${n}/${m}`).then(() => {
+      const b = document.querySelector('.copy-btn'); b.textContent = "✅ HOTOVO";
       setTimeout(() => b.textContent = "📋 Kopírovat", 1000);
     });
   }
-
   function addToSummary() {
+    const n = (valNad).toFixed(2).replace('.', ',');
+    const m = (valMimo).toFixed(2).replace('.', ',');
+    let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
+    if (isChodnik && currentTyp === 'ostatni' && !['štěrk','zeleň'].includes(label)) label += ' (CH)';
     const sumArea = document.getElementById('sum-input');
-    sumArea.value += (sumArea.value ? "\n\n" : "") + getFormattedResult();
+    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}\n${n}/${m}`;
     processSummary();
-    const b = document.querySelector('.add-btn');
-    b.textContent = "✅ PŘIDÁNO";
-    setTimeout(() => b.textContent = "➕ Do sumáře", 1000);
   }
-
-  function clearSummary() {
-    if(confirm("Opravdu vymazat?")) { document.getElementById('sum-input').value = ""; processSummary(); }
-  }
-
+  function clearSummary() { if(confirm("Opravdu vymazat?")) { document.getElementById('sum-input').value = ""; processSummary(); } }
   function processSummary() {
     const input = document.getElementById('sum-input').value;
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
     const totals = {};
-    let currentS = "neznámé";
+    let curS = "neznámé";
     for (let i = 0; i < lines.length; i++) {
       if (lines[i].includes('/')) {
         const val = lines[i].split('/');
         const n = parseFloat(val[0].replace(',', '.')) || 0;
         const m = parseFloat(val[1].replace(',', '.')) || 0;
-        if (!totals[currentS]) totals[currentS] = { n: 0, m: 0, c: 0 };
-        totals[currentS].n += n; totals[currentS].m += m; totals[currentS].c++;
-      } else currentS = lines[i].toLowerCase();
+        if (!totals[curS]) totals[curS] = { n: 0, m: 0, c: 0 };
+        totals[curS].n += n; totals[curS].m += m; totals[curS].c++;
+      } else curS = lines[i].toLowerCase();
     }
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
