@@ -274,13 +274,11 @@
           <tr>
             <th>POVRCH</th>
             <th>NAD (m²)</th>
-            <th>KÓDY NAD</th>
             <th>MIMO (m²)</th>
-            <th>KÓDY MIMO</th>
             <th style="text-align:right">CELKEM (m²)</th>
           </tr>
         </thead>
-        <tbody id="sum-body"><tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
+        <tbody id="sum-body"><tr><td colspan="4" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -325,18 +323,12 @@
 
     let html = `<span class="section-title">Kódy pro: ${data.label}</span>`;
     
-    // Nad výkopem
     html += `<div class="rps-row"><div class="rps-label-row">Nad výkopem:</div><div class="rps-button-group">`;
-    data.nad.forEach(code => {
-        html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`;
-    });
+    data.nad.forEach(code => { html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`; });
     html += `</div></div>`;
 
-    // Mimo výkop
     html += `<div class="rps-row"><div class="rps-label-row">Mimo výkop:</div><div class="rps-button-group">`;
-    data.mimo.forEach(code => {
-        html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`;
-    });
+    data.mimo.forEach(code => { html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`; });
     html += `</div></div>`;
 
     container.innerHTML = html;
@@ -437,13 +429,10 @@
   function addToSummary() {
     const n = (valNad).toFixed(2).replace('.', ',');
     const m = (valMimo).toFixed(2).replace('.', ',');
-    let key = (currentTyp === 'zelen') ? 'zeleň' : currentSurface;
-    const config = RPS_MAP[key];
-    const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
     let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
     if (isChodnik && currentTyp === 'ostatni' && !['štěrk','zeleň'].includes(label)) label += ' (CH)';
     const sumArea = document.getElementById('sum-input');
-    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}|${data.nad.join(', ')}|${data.mimo.join(', ')}\n${n}/${m}`;
+    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}\n${n}/${m}`;
     processSummary();
   }
 
@@ -456,16 +445,12 @@
     segments.forEach(seg => {
       const lines = seg.split('\n');
       if (lines.length >= 2) {
-        const header = lines[0].split('|');
-        const label = header[0];
-        const kn = header[1] || '-';
-        const km = header[2] || '-';
+        const label = lines[0];
         const vals = lines[1].split('/');
         const n = parseFloat(vals[0].replace(',', '.')) || 0;
         const m = parseFloat(vals[1].replace(',', '.')) || 0;
-        const key = `${label}|${kn}|${km}`;
-        if (!totals[key]) totals[key] = { n: 0, m: 0, label: label, kn: kn, km: km };
-        totals[key].n += n; totals[key].m += m;
+        if (!totals[label]) totals[label] = { n: 0, m: 0 };
+        totals[label].n += n; totals[label].m += m;
       }
     });
     const body = document.getElementById('sum-body');
@@ -474,10 +459,10 @@
     const keys = Object.keys(totals).sort();
     keys.forEach(k => {
       const d = totals[k]; gN += d.n; gM += d.m;
-      body.innerHTML += `<tr><td style="text-transform: capitalize;">${d.label}</td><td>${d.n.toFixed(2).replace('.',',')}</td><td style="font-family:'DM Mono'; font-size:11px; color:var(--suas-green)">${d.kn}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="font-family:'DM Mono'; font-size:11px; color:var(--suas-green)">${d.km}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
     });
-    if(keys.length > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td><strong>${gN.toFixed(2).replace('.',',')}</strong></td><td></td><td><strong>${gM.toFixed(2).replace('.',',')}</strong></td><td></td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
-    else body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
+    if(keys.length > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td><strong>${gN.toFixed(2).replace('.',',')}</strong></td><td><strong>${gM.toFixed(2).replace('.',',')}</strong></td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
+    else body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
   }
 
   updateVisibility(); calc();
