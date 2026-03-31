@@ -219,7 +219,7 @@
           </div>
 
           <div id="sterk-toggle" style="display:none; grid-column: 1 / -1; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
-            <span style="font-size: 11px; font-weight: 700;">Mimo výkop počítat jako zeleň?</span>
+            <span style="font-size: 11px; font-weight: 700;">Počítat i mimo výkop.</span>
             <div class="sub-switch" onclick="toggleSterkMimo()" id="sw-sterk">
               <div class="switch-bg"><div class="switch-dot"></div></div>
             </div>
@@ -234,7 +234,7 @@
       <div class="card">
         <span class="section-title">Výpočet ploch</span>
         <div class="res-box"><div class="res-label">Nad výkopem</div><div class="res-value" id="res-nad">0,00 m²</div><div id="sub-nad" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,00</div></div>
-        <div class="res-box green"><div class="res-label">Přídavná plocha</div><div class="res-value" id="res-mimo">0,00 m²</div><div id="sub-mimo" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,50</div></div>
+        <div class="res-box green"><div class="res-label">Mimo výkop</div><div class="res-value" id="res-mimo">0,00 m²</div><div id="sub-mimo" style="font-size:10px; font-family:'DM Mono'; color:var(--muted);">0,00 × 0,50</div></div>
         <div class="total-highlight"><div><div style="font-family:'DM Mono'; font-size:11px; font-weight:800; opacity:0.8;">CELKEM</div></div><div class="total-val" id="res-total">0,00 m²</div></div>
         
         <div class="action-group">
@@ -315,7 +315,7 @@
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' && currentTyp === 'ostatni' ? 'flex' : 'none');
-    const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba', 'mozaika'].includes(currentSurface);
+    const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
 
