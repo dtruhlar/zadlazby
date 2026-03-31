@@ -243,10 +243,23 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="rps-container" id="rps-dynamic-calc">
-          </div>
+      <div class="right-column">
+        <div class="card" style="border-left: 5px solid var(--suas-yellow); padding: 20px;">
+          <span class="section-title">💡 Stručný návod</span>
+          <ul style="font-size: 11px; color: var(--muted); list-style: none; line-height: 1.6;">
+            <li>• <strong>Ostatní:</strong> Standardní výpočet (přesah 0,5 m).</li>
+            <li>• <strong>V zeleni:</strong> Počítá se s hloubkou (Š+H+0,6).</li>
+            <li>• <strong>Štěrk:</strong> Přepínačem volíte 0 m² nebo logiku zeleně.</li>
+            <li>• <strong>Sumář:</strong> Tlačítko ➕ přidá data do tabulky.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="rps-container" id="rps-dynamic-calc" style="border-top: none; padding-top: 0;">
+            </div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -315,6 +328,8 @@
     document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
     document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' && currentTyp === 'ostatni' ? 'flex' : 'none');
+    
+    // VYŘAZENÍ MOZAIKY Z MOŽNOSTI CHODNÍKU
     const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
@@ -344,17 +359,18 @@
     updateRPSCalc();
   }
 
-  // Zbytek funkcí (Tabs, Theme, Summary) zůstává zachován z minula
   function openTab(tabId, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).classList.add('active'); btn.classList.add('active');
   }
+
   function toggleTheme() {
     document.body.classList.toggle('light-mode');
     document.getElementById('theme-bg').classList.toggle('active-switch');
     document.getElementById('theme-label').textContent = document.body.classList.contains('light-mode') ? 'DARK MODE' : 'LIGHT MODE';
   }
+
   function toggleChodnik() {
     isChodnik = !isChodnik;
     document.getElementById('sw-chodnik').classList.toggle('active-switch', isChodnik);
@@ -362,17 +378,20 @@
     document.getElementById('ch-label').style.color = isChodnik ? "var(--suas-green)" : "var(--muted)";
     calc();
   }
+
   function setTyp(t) {
     currentTyp = t;
     document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
     document.getElementById('btn-zelen').classList.toggle('active', t === 'zelen');
     updateVisibility(); calc();
   }
+
   function setSurface(s) {
     currentSurface = s;
     document.querySelectorAll('.surf-btn').forEach(b => b.classList.toggle('active', b.textContent === s));
     updateVisibility(); calc();
   }
+
   function copyToClipboard() {
     const n = (valNad).toFixed(2).replace('.', ',');
     const m = (valMimo).toFixed(2).replace('.', ',');
@@ -383,6 +402,7 @@
       setTimeout(() => b.textContent = "📋 Kopírovat", 1000);
     });
   }
+
   function addToSummary() {
     const n = (valNad).toFixed(2).replace('.', ',');
     const m = (valMimo).toFixed(2).replace('.', ',');
@@ -392,7 +412,9 @@
     sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}\n${n}/${m}`;
     processSummary();
   }
+
   function clearSummary() { if(confirm("Opravdu vymazat?")) { document.getElementById('sum-input').value = ""; processSummary(); } }
+
   function processSummary() {
     const input = document.getElementById('sum-input').value;
     const lines = input.split('\n').map(l => l.trim()).filter(l => l !== "");
