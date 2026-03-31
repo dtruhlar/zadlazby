@@ -147,10 +147,10 @@
     .rps-container { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
     .rps-row { margin-bottom: 15px; }
     .rps-label-row { font-size: 10px; color: var(--muted); font-family: 'DM Mono'; margin-bottom: 5px; text-transform: uppercase; }
-    .rps-button-group { display: flex; gap: 5px; }
+    .rps-button-group { display: flex; gap: 5px; flex-wrap: wrap; }
     .rps-mini-btn {
-      flex: 1; background: var(--input-bg); border: 1px solid var(--border); color: var(--suas-green);
-      padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; 
+      min-width: 60px; background: var(--input-bg); border: 1px solid var(--border); color: var(--suas-green);
+      padding: 6px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; transition: 0.2s; 
       font-family: 'DM Mono'; font-weight: 800; text-align: center;
     }
     .rps-mini-btn:hover { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.05); }
@@ -273,12 +273,13 @@
         <thead>
           <tr>
             <th>POVRCH</th>
+            <th>KÓDY (KLIKNI PRO KOPII)</th>
             <th>NAD (m²)</th>
             <th>MIMO (m²)</th>
             <th style="text-align:right">CELKEM (m²)</th>
           </tr>
         </thead>
-        <tbody id="sum-body"><tr><td colspan="4" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
+        <tbody id="sum-body"><tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -322,15 +323,12 @@
     const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
 
     let html = `<span class="section-title">Kódy pro: ${data.label}</span>`;
-    
     html += `<div class="rps-row"><div class="rps-label-row">Nad výkopem:</div><div class="rps-button-group">`;
     data.nad.forEach(code => { html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`; });
     html += `</div></div>`;
-
     html += `<div class="rps-row"><div class="rps-label-row">Mimo výkop:</div><div class="rps-button-group">`;
     data.mimo.forEach(code => { html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`; });
     html += `</div></div>`;
-
     container.innerHTML = html;
   }
 
@@ -338,7 +336,13 @@
     navigator.clipboard.writeText(text).then(() => {
       const orig = btn.innerText;
       btn.innerText = "OK";
-      setTimeout(() => { btn.innerText = orig; }, 800);
+      btn.style.color = "var(--suas-yellow)";
+      btn.style.borderColor = "var(--suas-yellow)";
+      setTimeout(() => { 
+        btn.innerText = orig; 
+        btn.style.color = "";
+        btn.style.borderColor = "";
+      }, 800);
     });
   }
 
@@ -438,6 +442,19 @@
 
   function clearSummary() { if(confirm("Opravdu vymazat?")) { document.getElementById('sum-input').value = ""; processSummary(); } }
 
+  function getCodesByLabel(label) {
+    let isCh = label.includes('(CH)');
+    let clean = label.replace(' (CH)', '').toLowerCase();
+    
+    if (clean === 'zeleň' || clean === 'zelen') return { nad: RPS_MAP['zeleň'].default.nad, mimo: RPS_MAP['zeleň'].default.mimo };
+    if (clean === 'štěrk' || clean === 'sterk') return { nad: RPS_MAP['štěrk'].default.nad, mimo: RPS_MAP['štěrk'].default.mimo };
+    
+    const config = RPS_MAP[clean];
+    if (!config) return { nad: [], mimo: [] };
+    const data = isCh ? config.chodnik : config.vozovka;
+    return { nad: data.nad, mimo: data.mimo };
+  }
+
   function processSummary() {
     const input = document.getElementById('sum-input').value;
     const segments = input.split('\n\n').filter(s => s.trim() !== "");
@@ -459,10 +476,26 @@
     const keys = Object.keys(totals).sort();
     keys.forEach(k => {
       const d = totals[k]; gN += d.n; gM += d.m;
-      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+      const codes = getCodesByLabel(k);
+      
+      let nadBtns = codes.nad.map(c => `<button class="rps-mini-btn" onclick="copyText('${c}', this)">${c}</button>`).join('');
+      let mimoBtns = codes.mimo.map(c => `<button class="rps-mini-btn" onclick="copyText('${c}', this)">${c}</button>`).join('');
+
+      body.innerHTML += `<tr>
+        <td style="text-transform: capitalize;">${k}</td>
+        <td>
+            <div style="font-size:9px; color:var(--muted); margin-bottom:2px;">NAD:</div>
+            <div class="rps-button-group" style="margin-bottom:6px;">${nadBtns || '-'}</div>
+            <div style="font-size:9px; color:var(--muted); margin-bottom:2px;">MIMO:</div>
+            <div class="rps-button-group">${mimoBtns || '-'}</div>
+        </td>
+        <td>${d.n.toFixed(2).replace('.',',')}</td>
+        <td>${d.m.toFixed(2).replace('.',',')}</td>
+        <td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td>
+      </tr>`;
     });
-    if(keys.length > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td><strong>${gN.toFixed(2).replace('.',',')}</strong></td><td><strong>${gM.toFixed(2).replace('.',',')}</strong></td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
-    else body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
+    if(keys.length > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td></td><td><strong>${gN.toFixed(2).replace('.',',')}</strong></td><td><strong>${gM.toFixed(2).replace('.',',')}</strong></td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
+    else body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
   }
 
   updateVisibility(); calc();
