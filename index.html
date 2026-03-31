@@ -145,14 +145,15 @@
     .clear-btn { background: #ef4444; color: white; margin-top: 10px; width: fit-content; align-self: flex-end; padding: 8px 15px; font-size: 10px; }
 
     .rps-container { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
-    .rps-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .rps-copy-btn {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
-      padding: 10px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: left;
+    .rps-row { margin-bottom: 15px; }
+    .rps-label-row { font-size: 10px; color: var(--muted); font-family: 'DM Mono'; margin-bottom: 5px; text-transform: uppercase; }
+    .rps-button-group { display: flex; gap: 5px; }
+    .rps-mini-btn {
+      flex: 1; background: var(--input-bg); border: 1px solid var(--border); color: var(--suas-green);
+      padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; 
+      font-family: 'DM Mono'; font-weight: 800; text-align: center;
     }
-    .rps-copy-btn:hover { border-color: var(--suas-green); }
-    .rps-copy-btn code { color: var(--suas-green); font-weight: 800; font-family: 'DM Mono'; font-size: 11px; margin-left: 5px; background: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 4px; }
+    .rps-mini-btn:hover { border-color: var(--suas-green); background: rgba(55, 179, 74, 0.05); }
 
     .summary-textarea {
       width: 100%; min-height: 200px; background: var(--input-bg); border: 2px solid var(--border);
@@ -290,27 +291,27 @@
 <script>
   const RPS_MAP = {
     'asfalt': { 
-      vozovka: { nad: 'MEB67, MEB68', mimo: 'MEB69, MEB70', label: 'Asfalt - Vozovka' }, 
-      chodnik: { nad: 'MEB31, MEB32', mimo: 'MEB33, MEB34', label: 'Asfalt - Chodník' } 
+      vozovka: { nad: ['MEB67', 'MEB68'], mimo: ['MEB69', 'MEB70'], label: 'Asfalt - Vozovka' }, 
+      chodnik: { nad: ['MEB31', 'MEB32'], mimo: ['MEB33', 'MEB34'], label: 'Asfalt - Chodník' } 
     },
     'zámková dlažba': { 
-      vozovka: { nad: 'MEB69, MEB70', mimo: 'MEB72, MEB73', label: 'Zámková dlažba - Vozovka' }, 
-      chodnik: { nad: 'MEB35, MEB36', mimo: 'MEB38, MEB39', label: 'Zámková dlažba - Chodník' } 
+      vozovka: { nad: ['MEB69', 'MEB70'], mimo: ['MEB72', 'MEB73'], label: 'Zámková dlažba - Vozovka' }, 
+      chodnik: { nad: ['MEB35', 'MEB36'], mimo: ['MEB38', 'MEB39'], label: 'Zámková dlažba - Chodník' } 
     },
     'beton. dlažba': { 
-      vozovka: { nad: 'MEB79, MEB80', mimo: 'MEB81, MEB82', label: 'Beton. dlažba - Vozovka' }, 
-      chodnik: { nad: 'MEB45, MEB46', mimo: 'MEB47, MEB48', label: 'Beton. dlažba - Chodník' } 
+      vozovka: { nad: ['MEB79', 'MEB80'], mimo: ['MEB81', 'MEB82'], label: 'Beton. dlažba - Vozovka' }, 
+      chodnik: { nad: ['MEB45', 'MEB46'], mimo: ['MEB47', 'MEB48'], label: 'Beton. dlažba - Chodník' } 
     },
     'kamenná dlažba': { 
-      vozovka: { nad: 'MEB75, MEB76', mimo: 'MEB77, MEB78', label: 'Kamenná dlažba - Vozovka' }, 
-      chodnik: { nad: 'MEB41, MEB42', mimo: 'MEB43, MEB44', label: 'Kamenná dlažba - Chodník' } 
+      vozovka: { nad: ['MEB75', 'MEB76'], mimo: ['MEB77', 'MEB78'], label: 'Kamenná dlažba - Vozovka' }, 
+      chodnik: { nad: ['MEB41', 'MEB42'], mimo: ['MEB43', 'MEB44'], label: 'Kamenná dlažba - Chodník' } 
     },
     'mozaika': { 
-      vozovka: { nad: 'MEB53, MEB54', mimo: 'MEB55, MEB56', label: 'Mozaika - Vozovka' }, 
-      chodnik: { nad: 'MEB53, MEB54', mimo: 'MEB55, MEB56', label: 'Mozaika - Chodník' } 
+      vozovka: { nad: ['MEB53', 'MEB54'], mimo: ['MEB55', 'MEB56'], label: 'Mozaika - Vozovka' }, 
+      chodnik: { nad: ['MEB53', 'MEB54'], mimo: ['MEB55', 'MEB56'], label: 'Mozaika - Chodník' } 
     },
-    'štěrk': { default: { nad: 'MEB83, MEB84', mimo: 'RDB93', label: 'Štěrk' } },
-    'zeleň': { default: { nad: 'RDB90', mimo: 'RDB91', label: 'Zeleň' } }
+    'štěrk': { default: { nad: ['MEB83', 'MEB84'], mimo: ['RDB93'], label: 'Štěrk' } },
+    'zeleň': { default: { nad: ['RDB90'], mimo: ['RDB91'], label: 'Zeleň' } }
   };
 
   let currentTyp = 'ostatni', currentSurface = 'asfalt', isChodnik = false, sterkMimo = false;
@@ -322,20 +323,30 @@
     const config = RPS_MAP[key];
     const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
 
-    container.innerHTML = `
-      <span class="section-title">Kódy pro: ${data.label}</span>
-      <div class="rps-grid">
-        <button class="rps-copy-btn" onclick="copyText('${data.nad}', this)">Nad: <code>${data.nad}</code></button>
-        <button class="rps-copy-btn" onclick="copyText('${data.mimo}', this)">Mimo: <code>${data.mimo}</code></button>
-      </div>
-    `;
+    let html = `<span class="section-title">Kódy pro: ${data.label}</span>`;
+    
+    // Nad výkopem
+    html += `<div class="rps-row"><div class="rps-label-row">Nad výkopem:</div><div class="rps-button-group">`;
+    data.nad.forEach(code => {
+        html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`;
+    });
+    html += `</div></div>`;
+
+    // Mimo výkop
+    html += `<div class="rps-row"><div class="rps-label-row">Mimo výkop:</div><div class="rps-button-group">`;
+    data.mimo.forEach(code => {
+        html += `<button class="rps-mini-btn" onclick="copyText('${code}', this)">${code}</button>`;
+    });
+    html += `</div></div>`;
+
+    container.innerHTML = html;
   }
 
   function copyText(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
-      const orig = btn.innerHTML;
-      btn.innerText = "Zkopírováno!";
-      setTimeout(() => { btn.innerHTML = orig; }, 800);
+      const orig = btn.innerText;
+      btn.innerText = "OK";
+      setTimeout(() => { btn.innerText = orig; }, 800);
     });
   }
 
@@ -432,7 +443,7 @@
     let label = currentTyp === 'zelen' ? 'zeleň' : currentSurface;
     if (isChodnik && currentTyp === 'ostatni' && !['štěrk','zeleň'].includes(label)) label += ' (CH)';
     const sumArea = document.getElementById('sum-input');
-    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}|${data.nad}|${data.mimo}\n${n}/${m}`;
+    sumArea.value += (sumArea.value ? "\n\n" : "") + `${label}|${data.nad.join(', ')}|${data.mimo.join(', ')}\n${n}/${m}`;
     processSummary();
   }
 
