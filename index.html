@@ -100,17 +100,6 @@
 
     .section-title { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.05em; }
 
-    .instructions-list { list-style: none; }
-    .instructions-list li { 
-      margin-bottom: 12px; 
-      font-size: 13px; 
-      line-height: 1.5; 
-      display: flex; 
-      gap: 10px; 
-      color: var(--text);
-    }
-    .instructions-list b { color: var(--suas-green); font-family: 'DM Mono'; }
-
     .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .tog-btn {
       padding: 10px; border: 2px solid var(--border); background: transparent; border-radius: 12px;
@@ -159,24 +148,25 @@
 
     /* RPS Styles */
     .rps-container { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
-    .rps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .rps-category { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; }
-    .rps-cat-title { font-size: 9px; font-weight: 800; color: var(--suas-yellow); margin-bottom: 8px; font-family: 'DM Mono'; }
-    .rps-btn-row { display: flex; flex-direction: column; gap: 5px; }
+    .rps-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .rps-grid-sum { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .rps-category { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px dashed var(--border); }
+    .rps-cat-title { font-size: 10px; font-weight: 800; color: var(--suas-yellow); margin-bottom: 10px; font-family: 'DM Mono'; text-transform: uppercase; }
+    .rps-btn-row { display: flex; flex-direction: column; gap: 8px; }
     .rps-copy-btn {
       display: flex; justify-content: space-between; align-items: center;
       background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
-      padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; text-align: left;
+      padding: 10px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: left;
     }
-    .rps-copy-btn:hover { border-color: var(--suas-light-blue); }
-    .rps-copy-btn code { color: var(--suas-green); font-weight: 800; font-family: 'DM Mono'; font-size: 12px; }
-    .rps-copy-btn.copied { background: var(--suas-green); color: white; }
+    .rps-copy-btn:hover { border-color: var(--suas-green); transform: translateY(-1px); }
+    .rps-copy-btn code { color: var(--suas-green); font-weight: 800; font-family: 'DM Mono'; font-size: 13px; margin-left: 10px; }
+    .rps-copy-btn.copied { background: var(--suas-green); color: white; border-color: var(--suas-green); }
     .rps-copy-btn.copied code { color: white; }
 
     .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .summary-textarea {
-      width: 100%; min-height: 220px; background: var(--input-bg); border: 2px solid var(--border);
-      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical;
+      width: 100%; min-height: 200px; background: var(--input-bg); border: 2px solid var(--border);
+      border-radius: 12px; padding: 15px; color: var(--text); font-family: 'DM Mono'; font-size: 13px; resize: vertical; margin-bottom: 15px;
     }
     .sum-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .sum-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); font-size: 10px; color: var(--muted); font-family: 'DM Mono'; }
@@ -190,11 +180,9 @@
       .instruction-card { display: none; }
       #tab-btn-navod { display: block; }
     }
-
     @media (max-width: 850px) {
       .main-grid { grid-template-columns: 1fr; }
-      .surface-selector { grid-template-columns: repeat(2, 1fr); }
-      .rps-grid { grid-template-columns: 1fr; }
+      .rps-grid-sum { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -204,7 +192,6 @@
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="openTab('tab-calc', this)">🏗️ KALKULAČKA</div>
     <div class="nav-tab" onclick="openTab('tab-sum', this)">📊 SUMÁŘ PLOCH</div>
-    <div class="nav-tab" id="tab-btn-navod" onclick="openTab('tab-navod', this)">📖 NÁVOD</div>
   </div>
 
   <header>
@@ -223,8 +210,8 @@
       <div class="card">
         <span class="section-title">Parametry výkopu</span>
         <div class="toggle-group">
-          <button class="tog-btn active" id="btn-ostatni" onclick="setTyp('ostatni')"><strong>🏗️ Ostatní</strong><span>Přesah + 0,5 m</span></button>
-          <button class="tog-btn" id="btn-zelen" onclick="setTyp('zelen')"><strong>🌿 V zeleni</strong><span>D × (Š+H+0,6)</span></button>
+          <button class="tog-btn active" id="btn-ostatni" onclick="setTyp('ostatni')"><strong>🏗️ Ostatní</strong><span>Zádlažby + Přesah</span></button>
+          <button class="tog-btn" id="btn-zelen" onclick="setTyp('zelen')"><strong>🌿 V zeleni</strong><span>Zásyp ornicí</span></button>
         </div>
 
         <div id="surface-section" class="surface-selector">
@@ -242,19 +229,11 @@
                <div class="switch-bg"><div class="switch-dot"></div></div>
              </div>
           </div>
-
-          <div id="sterk-toggle" style="display:none; grid-column: 1 / -1; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 5px;">
-            <span style="font-size: 11px;">Mimo výkop dle hloubky?</span>
-            <div class="sub-switch" onclick="toggleSterkMimo()" id="sw-sterk">
-              <div class="switch-bg"><div class="switch-dot"></div></div>
-            </div>
-          </div>
         </div>
 
         <div class="input-field"><div class="input-control"><input type="number" id="inp-delka" value="1" step="0.1" oninput="calc()"><span class="unit-tag">DÉLKA (m)</span></div></div>
-        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.05" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
-        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.05" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
-        <div id="txt-formula" style="font-family:'DM Mono'; font-size:10px; color:var(--muted); text-align: center; margin-top: 5px; opacity: 0.7;">Vzorec: (D×Š) + (D×0,5)</div>
+        <div class="input-field"><div class="input-control"><input type="number" id="inp-sirka" value="0.65" step="0.1" oninput="calc()"><span class="unit-tag">ŠÍŘKA (m)</span></div></div>
+        <div class="input-field" id="h-wrap" style="display:none"><div class="input-control"><input type="number" id="inp-hloubka" value="0.85" step="0.1" oninput="calc()"><span class="unit-tag">HLOUBKA (m)</span></div></div>
       </div>
 
       <div class="card">
@@ -269,15 +248,8 @@
         </div>
       </div>
 
-      <div class="card instruction-card" style="background: rgba(255,255,255,0.01);">
-        <span class="section-title">Pracovní postup</span>
-        <ul class="instructions-list">
-          <li><b>01</b> Vyber druh zádlažby a konstrukci.</li>
-          <li><b>02</b> Zadej rozměry a klikni na Kopírovat.</li>
-          <li><b>03</b> Použij RPS kódy níže pro rychlé kopírování názvů do systému.</li>
-        </ul>
-
-        <div class="rps-container" id="rps-module-calc">
+      <div class="card instruction-card">
+        <div class="rps-container" id="rps-dynamic-calc">
           </div>
       </div>
     </div>
@@ -289,9 +261,10 @@
         <span class="section-title">Hromadné sečtení ploch</span>
         <button class="clear-btn" onclick="clearSummary()">🗑️ Vymazat vše</button>
       </div>
-      <textarea class="summary-textarea" id="sum-input" placeholder="Data se sem vloží automaticky nebo je vložte ručně..." oninput="processSummary()"></textarea>
+      <textarea class="summary-textarea" id="sum-input" placeholder="Data se vloží automaticky..." oninput="processSummary()"></textarea>
       
-      <div class="rps-container" id="rps-module-sum" style="border-top:none; margin-bottom: 20px;"></div>
+      <div id="rps-full-sum" class="rps-grid-sum">
+          </div>
 
       <table class="sum-table">
         <thead>
@@ -304,83 +277,95 @@
     </div>
   </div>
 
-  <div id="tab-navod" class="page">
-    <div class="card">
-        <span class="section-title">Pracovní postup</span>
-        <ul class="instructions-list">
-          <li><b>1.</b> Vyber druh zádlažby.</li>
-          <li><b>2.</b> Vyber, zda je v chodníku nebo ve vozovce.</li>
-          <li><b>3.</b> Zadej délku výkopu a případně uprav šířku.</li>
-          <li><b>4.</b> Klikni na kopírovat a pokud chceš, přidej do sumáře.</li>
-          <li><b>5.</b> RPS kódy zkopíruješ kliknutím na příslušný kód v dolní části panelu.</li>
-        </ul>
-    </div>
-  </div>
-
-  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.8</footer>
+  <footer>© 2026 SUAS Grid s.r.o. - Ing. David Truhlář &nbsp; | &nbsp; v1.9</footer>
 </div>
 
 <script>
-  // DATA RPS KÓDŮ
-  const rpsData = [
-    { cat: "ZÁMKOVÁ DLAŽBA (CH)", nad: "MEB35", mimo: "MEB36" },
-    { cat: "ZÁMKOVÁ DLAŽBA (VOZ)", nad: "MEB69", mimo: "MEB70" },
-    { cat: "ASFALT (CH)", nad: "MEB31", mimo: "MEB32" },
-    { cat: "ASFALT (VOZ)", nad: "MEB67", mimo: "MEB68" },
-    { cat: "BETONOVÁ DLAŽBA (CH)", nad: "MEB45", mimo: "MEB46" },
-    { cat: "BETONOVÁ DLAŽBA (VOZ)", nad: "MEB79", mimo: "MEB80" },
-    { cat: "KAMENNÁ DLAŽBA (CH)", nad: "MEB41", mimo: "MEB42" },
-    { cat: "KAMENNÁ DLAŽBA (VOZ)", nad: "MEB75", mimo: "MEB76" },
-    { cat: "MOZAIKA (CH)", nad: "MEB53", mimo: "MEB54" },
-    { cat: "ŠTĚRK / ZELEŇ", nad: "MEB83", mimo: "RDB93", zelenNad: "RDB90", zelenMimo: "RDB91" }
-  ];
+  // DEFINICE KÓDŮ
+  const RPS_MAP = {
+    'asfalt': {
+      'vozovka': { nad: 'MEB67', mimo: 'MEB68', label: 'Asfalt - Vozovka' },
+      'chodnik': { nad: 'MEB31', mimo: 'MEB32', label: 'Asfalt - Chodník' }
+    },
+    'zámková dlažba': {
+      'vozovka': { nad: 'MEB69', mimo: 'MEB70', label: 'Zámková dlažba - Vozovka' },
+      'chodnik': { nad: 'MEB35', mimo: 'MEB36', label: 'Zámková dlažba - Chodník' }
+    },
+    'beton. dlažba': {
+      'vozovka': { nad: 'MEB79', mimo: 'MEB80', label: 'Beton. dlažba - Vozovka' },
+      'chodnik': { nad: 'MEB45', mimo: 'MEB46', label: 'Beton. dlažba - Chodník' }
+    },
+    'kamenná dlažba': {
+      'vozovka': { nad: 'MEB75', mimo: 'MEB76', label: 'Kamenná dlažba - Vozovka' },
+      'chodnik': { nad: 'MEB41', mimo: 'MEB42', label: 'Kamenná dlažba - Chodník' }
+    },
+    'mozaika': {
+      'vozovka': { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Vozovka' },
+      'chodnik': { nad: 'MEB53', mimo: 'MEB54', label: 'Mozaika - Chodník' }
+    },
+    'štěrk': {
+      'default': { nad: 'MEB83', mimo: 'RDB93', label: 'Štěrk' }
+    },
+    'zeleň': {
+      'default': { nad: 'RDB90', mimo: 'RDB91', label: 'Zeleň' }
+    }
+  };
 
-  function renderRPS() {
-    const modules = ['rps-module-calc', 'rps-module-sum'];
-    modules.forEach(modId => {
-      const container = document.getElementById(modId);
-      if(!container) return;
-      
-      let html = `<span class="section-title">Kódy položek RPS (Kliknutím kopíruj)</span><div class="rps-grid">`;
-      
-      rpsData.forEach(item => {
-        html += `
-          <div class="rps-category">
-            <div class="rps-cat-title">${item.cat}</div>
-            <div class="rps-btn-row">
-              <button class="rps-copy-btn" onclick="copyRPS('${item.nad}', this)">Nad výkopem <code>${item.nad}</code></button>
-              <button class="rps-copy-btn" onclick="copyRPS('${item.mimo || item.zelenMimo}', this)">Mimo výkop <code>${item.mimo || item.zelenMimo}</code></button>
-              ${item.zelenNad ? `<button class="rps-copy-btn" onclick="copyRPS('${item.zelenNad}', this)">Zeleň Nad <code>${item.zelenNad}</code></button>` : ''}
-            </div>
-          </div>`;
-      });
-      
-      html += `</div>`;
-      container.innerHTML = html;
-    });
+  let currentTyp = 'ostatni', currentSurface = 'asfalt', isChodnik = false;
+  let valNad = 0, valMimo = 0;
+
+  function updateRPSCalc() {
+    const container = document.getElementById('rps-dynamic-calc');
+    let key = currentSurface;
+    if (currentTyp === 'zelen') key = 'zeleň';
+    
+    const config = RPS_MAP[key];
+    const data = config.default || (isChodnik ? config.chodnik : config.vozovka);
+
+    container.innerHTML = `
+      <span class="section-title">RPS Kódy: ${data.label}</span>
+      <div class="rps-grid">
+        <button class="rps-copy-btn" onclick="copyText('${data.nad}', this)">Nad výkopem <code>${data.nad}</code></button>
+        <button class="rps-copy-btn" onclick="copyText('${data.mimo}', this)">Mimo výkop <code>${data.mimo}</code></button>
+      </div>
+    `;
   }
 
-  function copyRPS(text, btn) {
+  function renderRPSFullSum() {
+    const container = document.getElementById('rps-full-sum');
+    let html = '';
+    for (const [surf, modes] of Object.entries(RPS_MAP)) {
+        const item = modes.default || modes.chodnik; // Pro sumář stačí základ
+        html += `
+          <div class="rps-category" style="margin-bottom:10px">
+            <div class="rps-cat-title">${surf}</div>
+            <div class="rps-btn-row">
+              <button class="rps-copy-btn" onclick="copyText('${item.nad}', this)">Nad <code>${item.nad}</code></button>
+              <button class="rps-copy-btn" onclick="copyText('${item.mimo}', this)">Mimo <code>${item.mimo}</code></button>
+            </div>
+          </div>`;
+    }
+    container.innerHTML = html;
+  }
+
+  function copyText(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
-      const oldText = btn.innerHTML;
+      const original = btn.innerHTML;
       btn.classList.add('copied');
-      btn.innerText = "KOPÍROVÁNO!";
+      btn.innerText = "Zkopírováno!";
       setTimeout(() => {
         btn.classList.remove('copied');
-        btn.innerHTML = oldText;
+        btn.innerHTML = original;
       }, 800);
     });
   }
-
-  // --- PŮVODNÍ LOGIKA KALKULAČKY ---
-  let currentTyp = 'ostatni', currentSurface = 'asfalt', sterkMimo = true, isChodnik = false;
-  let valNad = 0, valMimo = 0;
 
   function openTab(tabId, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    if(btn) btn.classList.add('active');
+    btn.classList.add('active');
+    if(tabId === 'tab-sum') renderRPSFullSum();
   }
 
   function toggleTheme() {
@@ -397,12 +382,6 @@
     calc();
   }
 
-  function toggleSterkMimo() {
-    sterkMimo = !sterkMimo;
-    document.getElementById('sw-sterk').classList.toggle('active-switch', sterkMimo);
-    updateVisibility(); calc();
-  }
-
   function setTyp(t) {
     currentTyp = t;
     document.getElementById('btn-ostatni').classList.toggle('active', t === 'ostatni');
@@ -417,10 +396,8 @@
   }
 
   function updateVisibility() {
-    const showH = (currentTyp === 'zelen') || (currentTyp === 'ostatni' && currentSurface === 'štěrk' && sterkMimo);
-    document.getElementById('h-wrap').style.display = showH ? 'block' : 'none';
+    document.getElementById('h-wrap').style.display = (currentTyp === 'zelen') ? 'block' : 'none';
     document.getElementById('surface-section').style.display = (currentTyp === 'ostatni' ? 'grid' : 'none');
-    document.getElementById('sterk-toggle').style.display = (currentSurface === 'štěrk' ? 'flex' : 'none');
     const canBeChodnik = ['asfalt', 'beton. dlažba', 'kamenná dlažba', 'zámková dlažba', 'mozaika'].includes(currentSurface);
     document.getElementById('chodnik-wrap').style.display = (canBeChodnik && currentTyp === 'ostatni') ? 'flex' : 'none';
   }
@@ -430,20 +407,16 @@
     const s = parseFloat(document.getElementById('inp-sirka').value) || 0;
     const h = parseFloat(document.getElementById('inp-hloubka').value) || 0;
     valNad = d * s;
-    let subMimoTxt = (currentTyp === 'ostatni' && !(currentSurface === 'štěrk' && sterkMimo)) ? `${d.toFixed(2)} × 0,50` : `${d.toFixed(2)} × (${s.toFixed(2)}+${h.toFixed(2)}+0,6)`;
-    if (currentTyp === 'ostatni') {
-        if (currentSurface === 'štěrk' && sterkMimo) valMimo = d * (s + h + 0.6);
-        else if (currentSurface === 'štěrk' && !sterkMimo) { valMimo = 0; subMimoTxt = "0,00"; }
-        else valMimo = d * 0.5;
-    } else valMimo = d * (s + h + 0.6);
+    if (currentTyp === 'ostatni') valMimo = d * 0.5;
+    else valMimo = d * (s + h + 0.6);
 
     const f = (n) => n.toFixed(2).replace('.', ',');
     document.getElementById('res-nad').textContent = f(valNad) + ' m²';
     document.getElementById('sub-nad').textContent = `${f(d)} × ${f(s)}`;
     document.getElementById('res-mimo').textContent = f(valMimo) + ' m²';
-    document.getElementById('sub-mimo').textContent = subMimoTxt.replace(/\./g, ',');
+    document.getElementById('sub-mimo').textContent = currentTyp === 'ostatni' ? `${f(d)} × 0,50` : `${f(d)} × (${f(s)}+${f(h)}+0,6)`;
     document.getElementById('res-total').textContent = f(valNad + valMimo) + ' m²';
-    document.getElementById('txt-formula').textContent = (currentTyp === 'zelen' || (currentSurface === 'štěrk' && sterkMimo)) ? "Vzorec: (D×Š) + (D×(Š+H+0,6))" : "Vzorec: (D×Š) + (D×0,5)";
+    updateRPSCalc();
   }
 
   function getFormattedResult() {
@@ -464,8 +437,7 @@
 
   function addToSummary() {
     const sumArea = document.getElementById('sum-input');
-    const newEntry = getFormattedResult();
-    sumArea.value += (sumArea.value ? "\n\n" : "") + newEntry;
+    sumArea.value += (sumArea.value ? "\n\n" : "") + getFormattedResult();
     processSummary();
     const b = document.querySelector('.add-btn');
     b.textContent = "✅ PŘIDÁNO";
@@ -473,10 +445,7 @@
   }
 
   function clearSummary() {
-    if(confirm("Opravdu vymazat celý sumář?")) {
-        document.getElementById('sum-input').value = "";
-        processSummary();
-    }
+    if(confirm("Opravdu vymazat?")) { document.getElementById('sum-input').value = ""; processSummary(); }
   }
 
   function processSummary() {
@@ -496,18 +465,14 @@
     const body = document.getElementById('sum-body');
     body.innerHTML = "";
     let gN = 0, gM = 0, gC = 0;
-    const sorted = Object.keys(totals).sort();
-    if (!sorted.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>'; return; }
-    sorted.forEach(k => {
+    Object.keys(totals).sort().forEach(k => {
       const d = totals[k]; gN += d.n; gM += d.m; gC += d.c;
-      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td style="color:var(--muted)">${d.c}x</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
+      body.innerHTML += `<tr><td style="text-transform: capitalize;">${k}</td><td>${d.c}x</td><td>${d.n.toFixed(2).replace('.',',')}</td><td>${d.m.toFixed(2).replace('.',',')}</td><td style="text-align:right; color:var(--suas-light-blue)">${(d.n+d.m).toFixed(2).replace('.',',')}</td></tr>`;
     });
-    body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
+    if(gC > 0) body.innerHTML += `<tr class="row-grand-total"><td><strong>CELKEM</strong></td><td>${gC}x</td><td>${gN.toFixed(2).replace('.',',')}</td><td>${gM.toFixed(2).replace('.',',')}</td><td style="text-align:right"><strong>${(gN+gM).toFixed(2).replace('.',',')} m²</strong></td></tr>`;
+    else body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--muted)">Zatím žádná data</td></tr>';
   }
 
-  // Inicializace
-  renderRPS();
-  document.getElementById('sw-sterk').classList.add('active-switch');
   updateVisibility(); calc();
 </script>
 </body>
